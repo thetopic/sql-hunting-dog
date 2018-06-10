@@ -58,6 +58,13 @@ namespace HuntingDog
 
                 // additional init could be done after this line for the user control
                 HuntingDog.DogEngine.Impl.DiConstruct.Instance.HideYourself += Instance_HideYourself;
+                ReadConfiguration();
+                if (_cfg.ShowAfterOpen)
+                {
+                    _windowFrame.Show();
+                    HuntingDog.DogEngine.Impl.DiConstruct.Instance.ForceShowYourself();
+                }
+                return;
             }
 
             _windowFrame.Show();
@@ -86,6 +93,23 @@ namespace HuntingDog
             return windowFrame;
         }
 
+        // default configuration
+        Config.DogConfig _cfg = new Config.DogConfig();
+        // To refactor - use already read config from Connect.cs
+        private void ReadConfiguration()
+        {
+            try
+            {
+                var userPreference = HuntingDog.DogFace.UserPreferencesStorage.Load();
+                Config.ConfigPersistor pers = new Config.ConfigPersistor();
+                _cfg = pers.Restore<Config.DogConfig>(userPreference);
+
+            }
+            catch (Exception ex)
+            {
+                //log.Error("ReadConfiguration: failed", ex);
+            }
+        }
 
     }
 }

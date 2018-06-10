@@ -43,6 +43,7 @@ namespace HuntingDog.Config
             LimitSearch = 500;
 
             HideAfterAction = false;
+            ShowAfterOpen = true;
         }
 
         [Category("SELECT")]
@@ -151,6 +152,20 @@ namespace HuntingDog.Config
           set
           {
             _hideAfterAction = value;
+          }
+        }
+
+        private bool _showAfterOpen = false;
+
+        [Category("GENERAL")]
+        [DisplayName("Show window after openning an addin")]
+        [Description("Show Huntiong Dog window after creation of the plugin window.")]
+        public bool ShowAfterOpen
+        {
+          get { return _showAfterOpen; }
+          set
+          {
+            _showAfterOpen = value;
           }
         }
   
