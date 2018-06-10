@@ -896,17 +896,16 @@ namespace HuntingDog.DogFace
             }
             else if (((e.Key == Key.Enter) || (e.Key == Key.Space)) && itemsControl.SelectedIndex != -1)
             {
-                // open popup control and move focus to the first item there
-                OpenContextMenu();
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Right)
-            {
                 if (itemsControl.SelectedIndex != -1)
                 {
                     InvokeActionOnItem(itemsControl.SelectedItem as Item);
                 }
-
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Right)
+            {
+              // open popup control and move focus to the first item there
+                OpenContextMenu();
                 e.Handled = true;
 
             }
