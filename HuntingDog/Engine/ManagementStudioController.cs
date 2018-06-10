@@ -282,6 +282,10 @@ namespace DatabaseObjectSearcher
             }
 
             var uiConn = _uiConn[connInfo.ServerName];
+            if (uiConn != null)
+            {
+                uiConn.AdvancedOptions.Set("DATABASE", connInfo.DatabaseName);
+            }
 
             ServiceCache.ScriptFactory.CreateNewBlankScript(Microsoft.SqlServer.Management.UI.VSIntegration.Editors.ScriptType.Sql, uiConn, null);
 
