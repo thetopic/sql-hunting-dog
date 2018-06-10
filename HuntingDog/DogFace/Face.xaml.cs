@@ -1342,5 +1342,12 @@ namespace HuntingDog.DogFace
             SubscribeToAction(sender as ContextMenu);
         }
 
+        private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+          if (e.Key == Key.Escape)
+                HuntingDog.DogEngine.Impl.DiConstruct.Instance.ForceHideYourselfIfNeeded();
+        }
+
+      
     }
 }
