@@ -48,8 +48,8 @@ namespace HuntingDog.DogEngine
                         SearchWindow.SetTabPicture(HuntingDog.Properties.Resources.footprint.GetHbitmap());
                         HuntingDog.DogEngine.Impl.DiConstruct.Instance.HideYourself += Instance_HideYourself; ;
                     }
-
-                    SearchWindow.Visible = true;
+                    ReadConfiguration();
+                    SearchWindow.Visible = _cfg.ShowAfterOpen;
                 }
 
                 return SearchWindow;
@@ -67,5 +67,23 @@ namespace HuntingDog.DogEngine
                 SearchWindow.Visible = false;
         }
 
+        
+        // default configuration
+        Config.DogConfig _cfg = new Config.DogConfig();
+        // To refactor - use already read config from Connect.cs
+        private void ReadConfiguration()
+        {
+          try
+          {
+            var userPreference = HuntingDog.DogFace.UserPreferencesStorage.Load();
+            Config.ConfigPersistor pers = new Config.ConfigPersistor();
+            _cfg = pers.Restore<Config.DogConfig>(userPreference);
+
+          }
+          catch (Exception ex)
+          {
+            log.Error("ReadConfiguration: failed", ex);
+          }
+        }
     }
 }
