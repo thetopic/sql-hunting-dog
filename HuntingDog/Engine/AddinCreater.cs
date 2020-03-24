@@ -22,10 +22,10 @@ namespace HuntingDog.DogEngine
 
         private readonly Log log = LogFactory.GetLog();
 
-        public EnvDTE.Window SearchWindow
+        private EnvDTE.Window SearchWindow
         {
             get;
-            private set;
+            set;
         }
 
         public EnvDTE.Window CreateAddinWindow(AddIn addIn, string caption)
@@ -35,7 +35,7 @@ namespace HuntingDog.DogEngine
                 this.addIn = addIn;
 
                 var assemblyLocation = Assembly.GetExecutingAssembly().Location;
-                var className = typeof(HuntingDog.ucHost).FullName;             
+                var className = typeof(HuntingDog.ucHost).FullName;
                 Object userControl = null;
 
                 var windows = ServiceCache.ExtensibilityModel.Windows as Windows2;
@@ -46,9 +46,10 @@ namespace HuntingDog.DogEngine
                     {
                         SearchWindow = windows.CreateToolWindow2(addIn, assemblyLocation, className, caption, windowId, ref userControl);
                         SearchWindow.SetTabPicture(HuntingDog.Properties.Resources.footprint.GetHbitmap());
+                        HuntingDog.DogEngine.Impl.DiConstruct.Instance.HideYourself += Instance_HideYourself; ;
                     }
-
-                    SearchWindow.Visible = true;
+                    ReadConfiguration();
+                    SearchWindow.Visible = _cfg.ShowAfterOpen;
                 }
 
                 return SearchWindow;
@@ -58,6 +59,31 @@ namespace HuntingDog.DogEngine
                 log.Error("AddIn window could not be created", ex);
                 throw;
             }
+        }
+
+        private void Instance_HideYourself()
+        {
+            if (SearchWindow != null)
+                SearchWindow.Visible = false;
+        }
+
+        
+        // default configuration
+        Config.DogConfig _cfg = new Config.DogConfig();
+        // To refactor - use already read config from Connect.cs
+        private void ReadConfiguration()
+        {
+          try
+          {
+            var userPreference = HuntingDog.DogFace.UserPreferencesStorage.Load();
+            Config.ConfigPersistor pers = new Config.ConfigPersistor();
+            _cfg = pers.Restore<Config.DogConfig>(userPreference);
+
+          }
+          catch (Exception ex)
+          {
+            log.Error("ReadConfiguration: failed", ex);
+          }
         }
     }
 }

@@ -27,6 +27,8 @@ namespace HuntingDog.DogFace
 
         public const String _settingFileName = "HuntingDogPreferences.txt";
 
+        private static UserPreferencesStorage _preferences;
+
         [SuppressMessage("Microsoft.Usage", "CA2202")]
         [SuppressMessage("Microsoft.Reliability", "CA2000")]
         public void Save()
@@ -60,13 +62,15 @@ namespace HuntingDog.DogFace
         [SuppressMessage("Microsoft.Reliability", "CA2000")]
         public static UserPreferencesStorage Load()
         {
+            if (_preferences != null)
+                return _preferences;
             try
             {
                 var isoStore = GetIsolatedStorageFile();
 
                 if (isoStore.GetFileNames(_settingFileName).Length > 0)
                 {
-                    var newPref = new UserPreferencesStorage();
+                    _preferences = new UserPreferencesStorage();
 
                     using (var iStream = new IsolatedStorageFileStream(_settingFileName, FileMode.Open, isoStore))
                     {
@@ -82,12 +86,12 @@ namespace HuntingDog.DogFace
                                     break;
                                 }
 
-                                newPref.Add(new Entry() { Key = lineKey, Value = lineValue });
+                                _preferences.Add(new Entry() { Key = lineKey, Value = lineValue });
                             }
                         }
                     }
 
-                    return newPref;
+                    return _preferences;
 
                     //return Serializator.Load<UserPreferencesStorage>(fullName);
                 }
@@ -97,7 +101,8 @@ namespace HuntingDog.DogFace
                 log.Info("Could not load user preferences:" + ex.Message);
             }
 
-            return new UserPreferencesStorage();
+            _preferences = new UserPreferencesStorage();
+            return _preferences;
 
         }
 

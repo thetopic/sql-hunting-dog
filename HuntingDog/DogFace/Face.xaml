@@ -11,7 +11,7 @@
              mc:Ignorable="d"
              x:Class="HuntingDog.DogFace.Face"
              Loaded="UserControl_Loaded"
-             Unloaded="UserControl_Unloaded">
+             Unloaded="UserControl_Unloaded" PreviewKeyDown="UserControl_PreviewKeyDown"> 
 
     <UserControl.Resources>
        

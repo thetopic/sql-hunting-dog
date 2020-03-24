@@ -48,6 +48,12 @@ namespace HuntingDog.DogEngine
             set;
         }
 
+        public String DatabaseName
+        {
+            get;
+            set;
+        }
+
         public String ToSafeString()
         {
             if (InternalObject == null)

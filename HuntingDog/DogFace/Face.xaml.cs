@@ -195,8 +195,8 @@ namespace HuntingDog.DogFace
                 StudioController.SetConfiguration(_cfg);
                 StudioController.OnServersAdded += StudioController_OnServersAdded;
                 StudioController.OnServersRemoved += StudioController_OnServersRemoved;
+                StudioController.OnDatabaseChanged += StudioController_OnDatabaseChanged;
                 StudioController.ShowYourself += new System.Action(StudioController_ShowYourself);
-                StudioController.HideYourself +=  new System.Action(StudioController_HideYourself);
                 ReloadServers();
                 
                 ResultsFontSize = _cfg.FontSize;
@@ -278,12 +278,9 @@ namespace HuntingDog.DogFace
 
         void StudioController_ShowYourself()
         {
+            log.Info("StudioController_ShowYourself");
+            ReloadDatabaseList(false);
             txtSearch.Focus();
-        }
-
-        void StudioController_HideYourself()
-        {
-            Connect._addInCreater.SearchWindow.Visible = false;
         }
 
         void StudioController_OnServersAdded(List<IServer> listAdded)
@@ -337,22 +334,15 @@ namespace HuntingDog.DogFace
             });
         }
 
-        void StudioController_OnServersChanged()
+        void StudioController_OnDatabaseChanged(string serverName, string databaseName)
         {
-            log.Info("Face: server list changed.");
-
+            if (_userPref == null)
+                _userPref = UserPreferencesStorage.Load();
+            _userPref.StoreByName(UserPref_ServerDatabase + serverName, databaseName);
+            _userPref.Save();
             InvokeInUI(() =>
             {
-                ReloadServers();
-
-                if ((cbServer.SelectedIndex == -1) && (cbServer.Items.Count > 1))
-                {
-                    cbServer.SelectedIndex = 0;
-                }
-                else if (cbServer.Items.Count == 0)
-                {
-                    cbDatabase.ItemsSource = null;
-                }
+                ReloadDatabaseList(false);
             });
         }
 
@@ -520,7 +510,7 @@ namespace HuntingDog.DogFace
         {
             if ((SelectedServer != null) && (SelectedDatabase != null))
             {
-                _userPref.StoreByName(UserPref_ServerDatabase + SelectedServer, SelectedDatabase);
+                _userPref.StoreByName(UserPref_ServerDatabase + SelectedServer.ServerName, SelectedDatabase);
                 _userPref.Save();
             }
         }
@@ -701,7 +691,7 @@ namespace HuntingDog.DogFace
             Stop();
         }
 
-        internal IEnumerable<String> BuilsAvailableActions(Item item)
+        internal IEnumerable<String> BuildAvailableActions(Item item)
         {
             IEnumerable<String> result = new List<String>();
 
@@ -901,17 +891,16 @@ namespace HuntingDog.DogFace
             }
             else if (((e.Key == Key.Enter) || (e.Key == Key.Space)) && itemsControl.SelectedIndex != -1)
             {
-                // open popup control and move focus to the first item there
-                OpenContextMenu();
+                if (itemsControl.SelectedIndex != -1)
+                {
+                  InvokeActionOnItem(itemsControl.SelectedItem as Item);
+                }
                 e.Handled = true;
             }
             else if (e.Key == Key.Right)
             {
-                if (itemsControl.SelectedIndex != -1)
-                {
-                    InvokeActionOnItem(itemsControl.SelectedItem as Item);
-                }
-
+              // open popup control and move focus to the first item there
+                OpenContextMenu();
                 e.Handled = true;
 
             }
@@ -1264,7 +1253,7 @@ namespace HuntingDog.DogFace
                 ctx.Placement = PlacementMode.MousePoint;
                 ctx.HorizontalOffset = 0;
                 ctx.VerticalOffset = 4;
-                ctx.ItemsSource = BuilsAvailableActions(SelectedItem);
+                ctx.ItemsSource = BuildAvailableActions(SelectedItem);
             }
         }
 
@@ -1316,7 +1305,7 @@ namespace HuntingDog.DogFace
                 ctx.PlacementTarget = SelectedListViewItem;
                 ctx.HorizontalOffset = itemsControl.ActualWidth / 2;
                 ctx.VerticalOffset = SelectedListViewItem.ActualHeight / 2;
-                ctx.ItemsSource = BuilsAvailableActions(SelectedItem);
+                ctx.ItemsSource = BuildAvailableActions(SelectedItem);
                 ctx.IsOpen = true;
             }
         }
@@ -1345,6 +1334,12 @@ namespace HuntingDog.DogFace
         private void ContextMenu_Opened(Object sender, RoutedEventArgs e)
         {
             SubscribeToAction(sender as ContextMenu);
+        }
+
+        private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+          if (e.Key == Key.Escape)
+                HuntingDog.DogEngine.Impl.DiConstruct.Instance.ForceHideYourselfIfNeeded();
         }
 
       

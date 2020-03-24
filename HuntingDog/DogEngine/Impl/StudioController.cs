@@ -25,27 +25,39 @@ namespace HuntingDog.DogEngine.Impl
 
         public event Action<List<IServer>> OnServersRemoved;
 
+        public event Action<string, string> OnDatabaseChanged;
+
         private readonly Log log = LogFactory.GetLog();
 
 
-        private ObjectExplorerManager manager ;
+        private ObjectExplorerManager manager;
 
 
         IServerWatcher _srvWatcher;
 
-        public StudioController(ObjectExplorerManager mgr,IServerWatcher watcher)
+        public StudioController(ObjectExplorerManager mgr, IServerWatcher watcher)
         {
             manager = mgr;
+            manager.OnDatabaseChanged += Manager_OnDatabaseChanged;
+            
             _srvWatcher = watcher;
             _srvWatcher.OnServersAdded += _srvWatcher_OnServersAdded;
             _srvWatcher.OnServersRemoved += _srvWatcher_OnServersRemoved;
 
+
+
             Servers = new Dictionary<IServer, DatabaseLoader>();
+        }
+
+        private void Manager_OnDatabaseChanged(string serverName, string databaseName)
+        {
+            if (OnDatabaseChanged != null)
+                OnDatabaseChanged(serverName, databaseName);
         }
 
         void IStudioController.Initialise()
         {
-           
+
         }
 
 
@@ -57,7 +69,7 @@ namespace HuntingDog.DogEngine.Impl
                 if (Servers.ContainsKey(removedServer))
                 {
                     Servers.Remove(removedServer);
-                }               
+                }
             }
 
             if (Servers.Count == 0)
@@ -77,13 +89,13 @@ namespace HuntingDog.DogEngine.Impl
                 nvServer.Initialise(addedServer);
                 Servers.Add(addedServer, nvServer);
             }
-        
+
 
             OnServersAdded(addedServers.Cast<IServer>().ToList());
 
         }
-    
-   
+
+
         Dictionary<IServer, DatabaseLoader> Servers
         {
             get;
@@ -112,6 +124,7 @@ namespace HuntingDog.DogEngine.Impl
                 e.FullName = found.SchemaAndName;
                 e.InternalObject = found.Result;
                 e.Keywords = keywords;
+                e.DatabaseName = databaseName;
                 result.Add(e);
             }
 
@@ -137,7 +150,7 @@ namespace HuntingDog.DogEngine.Impl
         List<IServer> IStudioController.ListServers()
         {
             var res = new List<IServer>();
-            foreach(var srvKey in Servers.Keys)
+            foreach (var srvKey in Servers.Keys)
             {
                 res.Add(srvKey);
             }
@@ -172,7 +185,7 @@ namespace HuntingDog.DogEngine.Impl
                 var serverInfo = GetServer(serverName);
                 serverInfo.RefreshDatabaseList();
 
-            }, "Refreshing database list failed - " + serverName.ServerName );
+            }, "Refreshing database list failed - " + serverName.ServerName);
 
         }
 
@@ -184,7 +197,7 @@ namespace HuntingDog.DogEngine.Impl
                 var serverInfo = GetServer(serverName);
                 serverInfo.RefreshDatabase(dbName);
 
-            }, "Refreshing database failed - " + serverName.ServerName + " "+ dbName);
+            }, "Refreshing database failed - " + serverName.ServerName + " " + dbName);
 
         }
 
@@ -310,7 +323,7 @@ namespace HuntingDog.DogEngine.Impl
             return result;
         }
 
-     
+
         public void ForceShowYourself()
         {
             if (ShowYourself != null)
@@ -318,32 +331,37 @@ namespace HuntingDog.DogEngine.Impl
                 ShowYourself();
             }
         }
-
-        public void ForceHideYourselfIfNeeded()
+        public void ForceHideYourself()
         {
             if (HideYourself != null)
             {
-                if (_cfg.HideAfterAction)
-                    HideYourself();
+                HideYourself();
             }
         }
+        public void ForceHideYourselfIfNeeded()
+        {
+            if (_cfg.HideAfterAction)
+                ForceHideYourself();
+        }
 
-         public void ModifyFunction(IServer server, Entity entityObject)
+        public void ModifyFunction(IServer server, Entity entityObject)
         {
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
-                ManagementStudioController.OpenFunctionForModification(entityObject.InternalObject as UserDefinedFunction, serverInfo.Connection,_cfg.AlterOrCreate);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
+                ManagementStudioController.OpenFunctionForModification(entityObject.InternalObject as UserDefinedFunction, serverInfo.Connection, _cfg.AlterOrCreate);
                 ForceHideYourselfIfNeeded();
             }, "ModifyFunction failed - " + GetSafeEntityObject(entityObject));
         }
 
-        public void ModifyView(IServer server , Entity entityObject)
+        public void ModifyView(IServer server, Entity entityObject)
         {
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
-                ManagementStudioController.ModifyView(entityObject.InternalObject as View, serverInfo.Connection,_cfg.AlterOrCreate);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
+                ManagementStudioController.ModifyView(entityObject.InternalObject as View, serverInfo.Connection, _cfg.AlterOrCreate);
                 ForceHideYourselfIfNeeded();
             }, "ModifyView failed - " + GetSafeEntityObject(entityObject));
         }
@@ -353,7 +371,8 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
-                ManagementStudioController.OpenStoredProcedureForModification(entityObject.InternalObject as StoredProcedure, serverInfo.Connection,_cfg.AlterOrCreate);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
+                ManagementStudioController.OpenStoredProcedureForModification(entityObject.InternalObject as StoredProcedure, serverInfo.Connection, _cfg.AlterOrCreate);
                 ForceHideYourselfIfNeeded();
             }, "ModifyProcedure failed - " + GetSafeEntityObject(entityObject));
         }
@@ -363,8 +382,8 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
-                ManagementStudioController.SelectFromView(entityObject.InternalObject as View, serverInfo.Connection, _cfg.SelectTopX,_cfg.IncludeAllColumns,_cfg.AddWhereClauseFor,_cfg.AddNoLock);
-
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
+                ManagementStudioController.SelectFromView(entityObject.InternalObject as View, serverInfo.Connection, _cfg.SelectTopX, _cfg.IncludeAllColumns, _cfg.AddWhereClauseFor, _cfg.AddNoLock);
                 ForceHideYourselfIfNeeded();
             }, "SelectFromView failed - " + GetSafeEntityObject(entityObject));
         }
@@ -374,6 +393,7 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
                 ManagementStudioController.ExecuteStoredProc(entityObject.InternalObject as StoredProcedure, serverInfo.Connection);
                 ForceHideYourselfIfNeeded();
             }, "ExecuteProcedure failed - " + GetSafeEntityObject(entityObject));
@@ -384,6 +404,7 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
                 ManagementStudioController.ExecuteFunction(entityObject.InternalObject as UserDefinedFunction, serverInfo.Connection);
                 ForceHideYourselfIfNeeded();
             }, "ExecuteProcedure failed - " + GetSafeEntityObject(entityObject));
@@ -399,7 +420,8 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
-                ManagementStudioController.ScriptTable(entityObject.InternalObject as Table, serverInfo.Connection, _cfg.ScriptIndexes, _cfg.ScriptForeignKeys,_cfg.ScriptTriggers);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
+                ManagementStudioController.ScriptTable(entityObject.InternalObject as Table, serverInfo.Connection, _cfg.ScriptIndexes, _cfg.ScriptForeignKeys, _cfg.ScriptTriggers);
                 ForceHideYourselfIfNeeded();
             }, "ScriptTable - " + GetSafeEntityObject(entityObject));
         }
@@ -409,7 +431,8 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
-                ManagementStudioController.SelectFromTable(entityObject.InternalObject as Table, serverInfo.Connection, _cfg.SelectTopX,_cfg.IncludeAllColumns,_cfg.AddWhereClauseFor,  _cfg.AddNoLock, _cfg.OrderBy);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
+                ManagementStudioController.SelectFromTable(entityObject.InternalObject as Table, serverInfo.Connection, _cfg.SelectTopX, _cfg.IncludeAllColumns, _cfg.AddWhereClauseFor, _cfg.AddNoLock, _cfg.OrderBy);
                 ForceHideYourselfIfNeeded();
             }, "SelectFromTable - " + GetSafeEntityObject(entityObject));
         }
@@ -419,6 +442,7 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
                 manager.OpenTable2(entityObject.InternalObject as Table, serverInfo.Connection, serverInfo.Server);
                 ForceHideYourselfIfNeeded();
             }, "EditTableData - " + GetSafeEntityObject(entityObject));
@@ -429,6 +453,7 @@ namespace HuntingDog.DogEngine.Impl
             this.SafeRun(() =>
             {
                 var serverInfo = GetServer(server);
+                serverInfo.Connection.DatabaseName = entityObject.DatabaseName;
                 ManagementStudioController.DesignTable(entityObject.InternalObject as Table, serverInfo.Connection);
                 ForceHideYourselfIfNeeded();
             }, "DesignTable - " + GetSafeEntityObject(entityObject));
