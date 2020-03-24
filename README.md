@@ -1,6 +1,6 @@
 # README #
 
-Addin works only in MSSQL 18 (2019)
+Addin works only in MS SSMS 18 (2019)
 
 
 Developed in Visual Studio 2019
