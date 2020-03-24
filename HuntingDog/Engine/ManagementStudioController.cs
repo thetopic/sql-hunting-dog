@@ -26,7 +26,6 @@ namespace DatabaseObjectSearcher
 				return "ALTER";
 			else
 				return "CREATE";
-
 		}
 
 		private static readonly Log log = LogFactory.GetLog();
