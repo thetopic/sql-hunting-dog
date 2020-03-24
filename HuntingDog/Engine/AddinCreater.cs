@@ -35,7 +35,7 @@ namespace HuntingDog.DogEngine
                 this.addIn = addIn;
 
                 var assemblyLocation = Assembly.GetExecutingAssembly().Location;
-                var className = typeof(HuntingDog.ucHost).FullName;             
+                var className = typeof(HuntingDog.ucHost).FullName;
                 Object userControl = null;
 
                 var windows = ServiceCache.ExtensibilityModel.Windows as Windows2;

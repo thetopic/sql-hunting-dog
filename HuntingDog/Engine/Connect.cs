@@ -236,9 +236,10 @@ namespace HuntingDog
                 {
                     // we need to iterate through existing windows and
 
-                    if ((addinWindow != null) && addinWindow.Visible)
+                    if (addinWindow != null) 
                     {
                         log.Info("Activate window");
+                                                addinWindow.Visible = true;
                         addinWindow.Activate();
                         HuntingDog.DogEngine.Impl.DiConstruct.Instance.ForceShowYourself();
                     }
@@ -247,8 +248,8 @@ namespace HuntingDog
                         //BuildCommandInToolsMenu();
                         log.Info("Create Addin Window");
 
-
                         addinWindow = _addInCreater.CreateAddinWindow(addInInstance, Caption);
+                        addinWindow.Visible = true;
                         //MSSQLController.Current.CreateAddinWindow(_addInInstance);
                     }
 

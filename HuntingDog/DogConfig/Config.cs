@@ -7,7 +7,8 @@ namespace HuntingDog.Config
     public enum EAlterOrCreate
     {
         Alter,
-        Create
+        Create,
+        CreateOrAlter
     }
 
     public enum EOrderBy

@@ -13,6 +13,8 @@ namespace HuntingDog.DogEngine
         event Action<List<IServer>> OnServersAdded;
         event Action<List<IServer>> OnServersRemoved;
 
+        event Action<string, string> OnDatabaseChanged;
+
         // Search
         List<Entity> Find(IServer serverName, String databaseName, String searchText, int searchLimit);
 

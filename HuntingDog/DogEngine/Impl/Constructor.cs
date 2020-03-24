@@ -11,7 +11,7 @@ namespace HuntingDog.DogEngine.Impl
         static object _lockConcurrentAccess  = new object();
         private static StudioController Build()
         {
-            var manager = new ObjectExplorerManager();
+            var manager = new ObjectExplorerManager(HuntingDogPackage.Instance);
             var srvWatcher = new ServerWatcher(manager);
             var sudioCtrl = new StudioController(manager,srvWatcher);
             return sudioCtrl;

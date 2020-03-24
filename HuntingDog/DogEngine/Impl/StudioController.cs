@@ -25,27 +25,39 @@ namespace HuntingDog.DogEngine.Impl
 
         public event Action<List<IServer>> OnServersRemoved;
 
+        public event Action<string, string> OnDatabaseChanged;
+
         private readonly Log log = LogFactory.GetLog();
 
 
-        private ObjectExplorerManager manager ;
+        private ObjectExplorerManager manager;
 
 
         IServerWatcher _srvWatcher;
 
-        public StudioController(ObjectExplorerManager mgr,IServerWatcher watcher)
+        public StudioController(ObjectExplorerManager mgr, IServerWatcher watcher)
         {
             manager = mgr;
+            manager.OnDatabaseChanged += Manager_OnDatabaseChanged;
+            
             _srvWatcher = watcher;
             _srvWatcher.OnServersAdded += _srvWatcher_OnServersAdded;
             _srvWatcher.OnServersRemoved += _srvWatcher_OnServersRemoved;
 
+
+
             Servers = new Dictionary<IServer, DatabaseLoader>();
+        }
+
+        private void Manager_OnDatabaseChanged(string serverName, string databaseName)
+        {
+            if (OnDatabaseChanged != null)
+                OnDatabaseChanged(serverName, databaseName);
         }
 
         void IStudioController.Initialise()
         {
-           
+
         }
 
 
@@ -57,7 +69,7 @@ namespace HuntingDog.DogEngine.Impl
                 if (Servers.ContainsKey(removedServer))
                 {
                     Servers.Remove(removedServer);
-                }               
+                }
             }
 
             if (Servers.Count == 0)
@@ -77,13 +89,13 @@ namespace HuntingDog.DogEngine.Impl
                 nvServer.Initialise(addedServer);
                 Servers.Add(addedServer, nvServer);
             }
-        
+
 
             OnServersAdded(addedServers.Cast<IServer>().ToList());
 
         }
-    
-   
+
+
         Dictionary<IServer, DatabaseLoader> Servers
         {
             get;
@@ -138,7 +150,7 @@ namespace HuntingDog.DogEngine.Impl
         List<IServer> IStudioController.ListServers()
         {
             var res = new List<IServer>();
-            foreach(var srvKey in Servers.Keys)
+            foreach (var srvKey in Servers.Keys)
             {
                 res.Add(srvKey);
             }
@@ -173,7 +185,7 @@ namespace HuntingDog.DogEngine.Impl
                 var serverInfo = GetServer(serverName);
                 serverInfo.RefreshDatabaseList();
 
-            }, "Refreshing database list failed - " + serverName.ServerName );
+            }, "Refreshing database list failed - " + serverName.ServerName);
 
         }
 
@@ -185,7 +197,7 @@ namespace HuntingDog.DogEngine.Impl
                 var serverInfo = GetServer(serverName);
                 serverInfo.RefreshDatabase(dbName);
 
-            }, "Refreshing database failed - " + serverName.ServerName + " "+ dbName);
+            }, "Refreshing database failed - " + serverName.ServerName + " " + dbName);
 
         }
 
@@ -311,7 +323,7 @@ namespace HuntingDog.DogEngine.Impl
             return result;
         }
 
-     
+
         public void ForceShowYourself()
         {
             if (ShowYourself != null)
@@ -319,17 +331,20 @@ namespace HuntingDog.DogEngine.Impl
                 ShowYourself();
             }
         }
-
-        public void ForceHideYourselfIfNeeded()
+        public void ForceHideYourself()
         {
             if (HideYourself != null)
             {
-                if (_cfg.HideAfterAction)
-                    HideYourself();
+                HideYourself();
             }
         }
+        public void ForceHideYourselfIfNeeded()
+        {
+            if (_cfg.HideAfterAction)
+                ForceHideYourself();
+        }
 
-         public void ModifyFunction(IServer server, Entity entityObject)
+        public void ModifyFunction(IServer server, Entity entityObject)
         {
             this.SafeRun(() =>
             {
@@ -340,7 +355,7 @@ namespace HuntingDog.DogEngine.Impl
             }, "ModifyFunction failed - " + GetSafeEntityObject(entityObject));
         }
 
-        public void ModifyView(IServer server , Entity entityObject)
+        public void ModifyView(IServer server, Entity entityObject)
         {
             this.SafeRun(() =>
             {

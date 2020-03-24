@@ -10,7 +10,7 @@ namespace HuntingDog.Core
 {
     public static class LogFactory
     {
-        private const String DefaultLogFileName = "${basedir}/Logs/HuntingDog.log";
+        private const String DefaultLogFileName = "c:/Logs/HuntingDog.log";
 
         private const String DefaultLogLayout = "${longdate} ${level:uppercase=true:padding=-5} [${logger:shortName=true}] ${message} ${exception:format=tostring}";
 
