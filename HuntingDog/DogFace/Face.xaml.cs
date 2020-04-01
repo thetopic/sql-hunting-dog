@@ -342,7 +342,7 @@ namespace HuntingDog.DogFace
             _userPref.Save();
             InvokeInUI(() =>
             {
-                ReloadDatabaseList(false);
+                ReloadDatabaseList(false, setFocus: false);
             });
         }
 
@@ -418,7 +418,7 @@ namespace HuntingDog.DogFace
             SetStatus("Completed reloading " + cmd.DatabaseName);
         }
 
-        void ReloadDatabaseList(bool keepSameDatabase)
+        void ReloadDatabaseList(bool keepSameDatabase, bool setFocus = true)
         {
             string databaseName = string.Empty;
             try
@@ -466,12 +466,14 @@ namespace HuntingDog.DogFace
                     {
                         // we managed to find our database - restore search text
                         RestoreLastSearchTextFromUserProfile();
-                        txtSearch.Focus();
+                        if (setFocus)
+                            txtSearch.Focus();
                     }
                     else
                     {
                         ClearSearchText();
-                        cbDatabase.Focus();
+                        if (setFocus)
+                            cbDatabase.Focus();
                     }
                 }
                 else
