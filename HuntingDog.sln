@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "�
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuntingDog2019", "HuntingDog2019\HuntingDog2019.csproj", "{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{BF72D233-825A-45A4-9E82-522191B79C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF72D233-825A-45A4-9E82-522191B79C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF72D233-825A-45A4-9E82-522191B79C5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

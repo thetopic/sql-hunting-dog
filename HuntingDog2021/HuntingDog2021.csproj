@@ -47,6 +47,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CreateVsixContainer>False</CreateVsixContainer>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\HuntingDog\Core\DogVersion.cs">
@@ -202,7 +203,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\HuntingDog2019\packages.config">
+    <None Include="packages.config">
       <Link>packages.config</Link>
     </None>
     <None Include="source.extension.vsixmanifest">
