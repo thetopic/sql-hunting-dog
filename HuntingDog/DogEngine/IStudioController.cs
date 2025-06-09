@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 
-namespace HuntingDog.DogEngine
-{
-    public interface IStudioController
-    {
+namespace HuntingDog.DogEngine {
+    public interface IStudioController {
         event Action ShowYourself;
         event Action HideYourself;
 
@@ -20,7 +18,7 @@ namespace HuntingDog.DogEngine
 
         void Initialise();
 
-        void SetConfiguration(HuntingDog.Config.DogConfig cfg);
+        void SetConfiguration(Config.DogConfig cfg);
 
         List<IServer> ListServers();
 

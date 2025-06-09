@@ -9,11 +9,9 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using HuntingDog.Core;
 
-namespace HuntingDog.DogFace
-{
+namespace HuntingDog.DogFace {
     [ComVisible(false)]
-    public class HtmlTextBlock : TextBlock
-    {
+    public class HtmlTextBlock : TextBlock {
         protected readonly Log log = LogFactory.GetLog();
 
         private List<Run> runs = new List<Run>();
@@ -32,86 +30,69 @@ namespace HuntingDog.DogFace
             new UIPropertyMetadata(true, new PropertyChangedCallback(OnHighlightChanged))
         );
 
-        public Item ResultItem
-        {
-            get
-            {
-                return (Item) GetValue(ResultItemProperty);
+        public Item ResultItem {
+            get {
+                return (Item)GetValue(ResultItemProperty);
             }
 
-            set
-            {
+            set {
                 SetValue(ResultItemProperty, value);
             }
         }
 
-        public Boolean DoHighlight
-        {
-            get
-            {
-                return (Boolean) GetValue(DoHighlighProperty);
+        public Boolean DoHighlight {
+            get {
+                return (Boolean)GetValue(DoHighlighProperty);
             }
 
-            set
-            {
+            set {
                 SetValue(DoHighlighProperty, value);
             }
         }
 
-        public static void OnResultItemChanged(DependencyObject s, DependencyPropertyChangedEventArgs e)
-        {
+        public static void OnResultItemChanged(DependencyObject s, DependencyPropertyChangedEventArgs e) {
             var htmlTextBlock = (s as HtmlTextBlock);
 
-            if (htmlTextBlock != null)
-            {
+            if (htmlTextBlock != null) {
                 htmlTextBlock.DisplayResultItem(htmlTextBlock.ResultItem);
             }
         }
 
-        public static void OnHighlightChanged(DependencyObject s, DependencyPropertyChangedEventArgs e)
-        {
+        public static void OnHighlightChanged(DependencyObject s, DependencyPropertyChangedEventArgs e) {
             var htmlTextBlock = (s as HtmlTextBlock);
 
-            if ((htmlTextBlock != null) && (e != null) && (e.NewValue is Boolean))
-            {
-                htmlTextBlock.ChangeHighlight((Boolean) e.NewValue);
+            if ((htmlTextBlock != null) && (e != null) && (e.NewValue is Boolean)) {
+                htmlTextBlock.ChangeHighlight((Boolean)e.NewValue);
             }
         }
 
-        private void DisplayResultItem(Item resultItem)
-        {
+        private void DisplayResultItem(Item resultItem) {
             var analyzer = new PerformanceAnalyzer();
 
             Inlines.Clear();
             runs.Clear();
 
-            if ((resultItem.Keywords == null) || resultItem.Keywords.IsEmpty())
-            {
+            if ((resultItem.Keywords == null) || resultItem.Keywords.IsEmpty()) {
                 // TODO: get rid of code duplication (lines 89, 106, 116)
                 var run = new Run(resultItem.Name);
                 Inlines.Add(run);
             }
-            else
-            {
-                try
-                {
+            else {
+                try {
                     var ranges = FindMatchingKeyworkRanges(resultItem);
 
-                    if (ranges.Any())
-                    {
+                    if (ranges.Any()) {
                         var mergedResult = Range<Int32>.Merge(ranges);
                         BuildRunsFromMergedResults(resultItem, mergedResult);
                     }
-                    else
-                    {
+                    else {
                         // TODO: get rid of code duplication (lines 89, 106, 116)
                         var run = new Run(resultItem.Name);
                         Inlines.Add(run);
                     }
                 }
                 // TODO: What is it for? How can any exception happen here?
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     log.Error(ex.Message, ex);
 
                     // TODO: get rid of code duplication (lines 89, 106, 116)
@@ -122,25 +103,20 @@ namespace HuntingDog.DogFace
 
         }
 
-        private List<Range<Int32>> FindMatchingKeyworkRanges(Item resultItem)
-        {
+        private List<Range<Int32>> FindMatchingKeyworkRanges(Item resultItem) {
             var ranges = new List<Range<Int32>>();
 
             var analyzer = new PerformanceAnalyzer();
 
-            foreach (var keyword in resultItem.Keywords)
-            {
-                if (!string.IsNullOrEmpty(keyword))
-                {
+            foreach (var keyword in resultItem.Keywords) {
+                if (!string.IsNullOrEmpty(keyword)) {
                     var startIndex = 0;
 
-                    while ((startIndex = resultItem.UpperCaseNames.IndexOf(keyword, startIndex)) != -1)
-                    {
+                    while ((startIndex = resultItem.UpperCaseNames.IndexOf(keyword, startIndex)) != -1) {
                         int endIndex = (startIndex + keyword.Length);
 
                         // TODO: How is it possible?
-                        if (endIndex > resultItem.UpperCaseNames.Length)
-                        {
+                        if (endIndex > resultItem.UpperCaseNames.Length) {
                             endIndex = resultItem.UpperCaseNames.Length;
                         }
 
@@ -153,14 +129,11 @@ namespace HuntingDog.DogFace
             return ranges;
         }
 
-        private void BuildRunsFromMergedResults(Item resultItem, IEnumerable<Range<Int32>> mergedResult)
-        {
+        private void BuildRunsFromMergedResults(Item resultItem, IEnumerable<Range<Int32>> mergedResult) {
             var currentIndex = 0;
 
-            foreach (var range in mergedResult)
-            {
-                if (currentIndex < range.Start)
-                {
+            foreach (var range in mergedResult) {
+                if (currentIndex < range.Start) {
                     // add normal run
                     var normalRun = new Run(resultItem.Name.Substring(currentIndex, (range.Start - currentIndex)));
                     Inlines.Add(normalRun);
@@ -174,32 +147,27 @@ namespace HuntingDog.DogFace
                 currentIndex = range.End;
             }
 
-            if (currentIndex < resultItem.Name.Length)
-            {
+            if (currentIndex < resultItem.Name.Length) {
                 // add final normal run if necessary
                 var normalRun = new Run(resultItem.Name.Substring(currentIndex));
                 Inlines.Add(normalRun);
             }
         }
 
-        private void ChangeHighlight(Boolean selectedItem)
-        {
+        private void ChangeHighlight(Boolean selectedItem) {
             Brush foregroundBrush = null;
             Brush backgroundBrush = null;
 
-            if (selectedItem)
-            {
+            if (selectedItem) {
                 foregroundBrush = new SolidColorBrush(Colors.White);
                 backgroundBrush = new SolidColorBrush(Colors.Transparent);
             }
-            else
-            {
+            else {
                 foregroundBrush = new SolidColorBrush(Colors.Black);
-                backgroundBrush = new SolidColorBrush(Color.FromRgb(255,232,166));
+                backgroundBrush = new SolidColorBrush(Color.FromRgb(255, 232, 166));
             }
 
-            foreach (var run in runs)
-            {
+            foreach (var run in runs) {
                 run.Foreground = foregroundBrush;
                 run.Background = backgroundBrush;
             }

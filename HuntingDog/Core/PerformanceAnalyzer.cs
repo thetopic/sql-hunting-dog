@@ -2,55 +2,43 @@
 using System;
 using System.Diagnostics;
 
-namespace HuntingDog.Core
-{
-    public class PerformanceAnalyzer
-    {
+namespace HuntingDog.Core {
+    public class PerformanceAnalyzer {
         private readonly Boolean disabled = true;
 
         private readonly Log log = LogFactory.GetLog();
 
         private readonly Object synchronizer = new Object();
 
-        private Stopwatch watcher = new Stopwatch();
+        private readonly Stopwatch watcher = new Stopwatch();
 
-        public PerformanceAnalyzer()
-        {
-            if (disabled)
-            {
+        public PerformanceAnalyzer() {
+            if (disabled) {
                 return;
             }
 
             Start();
         }
 
-        ~PerformanceAnalyzer()
-        {
-            if (disabled)
-            {
+        ~PerformanceAnalyzer() {
+            if (disabled) {
                 return;
             }
 
-            lock (synchronizer)
-            {
-                if (watcher.IsRunning)
-                {
+            lock (synchronizer) {
+                if (watcher.IsRunning) {
                     watcher.Stop();
                 }
             }
         }
 
-        public void Start()
-        {
-            if (disabled)
-            {
+        public void Start() {
+            if (disabled) {
                 return;
             }
 
-            lock (synchronizer)
-            {
-                if (watcher.IsRunning)
-                {
+            lock (synchronizer) {
+                if (watcher.IsRunning) {
                     log.Error("Cannot start: analyzer is still working");
                     return;
                 }
@@ -60,17 +48,13 @@ namespace HuntingDog.Core
             }
         }
 
-        public Stopwatch Stop()
-        {
-            if (disabled)
-            {
+        public Stopwatch Stop() {
+            if (disabled) {
                 return Result;
             }
 
-            lock (synchronizer)
-            {
-                if (!watcher.IsRunning)
-                {
+            lock (synchronizer) {
+                if (!watcher.IsRunning) {
                     log.Error("Cannot stop: analyzer is not working");
                     return null;
                 }
@@ -81,12 +65,9 @@ namespace HuntingDog.Core
             }
         }
 
-        public Stopwatch Result
-        {
-            get
-            {
-                lock (synchronizer)
-                {
+        public Stopwatch Result {
+            get {
+                lock (synchronizer) {
                     return watcher;
                 }
             }

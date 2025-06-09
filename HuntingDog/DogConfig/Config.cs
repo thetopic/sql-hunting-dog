@@ -2,30 +2,25 @@
 using System.ComponentModel;
 using System.IO;
 
-namespace HuntingDog.Config
-{
-    public enum EAlterOrCreate
-    {
+namespace HuntingDog.Config {
+    public enum EAlterOrCreate {
         Alter,
         Create,
         CreateOrAlter
     }
 
-    public enum EOrderBy
-    {
+    public enum EOrderBy {
         None,
         Ascending,
         Descending
     }
 
-    public class DogConfig
-    {
+    public class DogConfig {
         private int _selectTopXTable;
         private int _limitSearch;
         private int _fontSize;
 
-        public DogConfig()
-        {
+        public DogConfig() {
             FontSize = 14;
 
             ScriptIndexes = true;
@@ -85,11 +80,9 @@ namespace HuntingDog.Config
         [Category("SELECT")]
         [DisplayName("Select top X")]
         [Description("Override row count limitation when you select data from the table or view")]
-        public int SelectTopX
-        {
+        public int SelectTopX {
             get { return _selectTopXTable; }
-            set
-            {
+            set {
                 if (value <= 0)
                     throw new InvalidDataException("Must be greater than zero");
                 _selectTopXTable = value;
@@ -99,11 +92,9 @@ namespace HuntingDog.Config
         [Category("GENERAL")]
         [DisplayName("Search Limit")]
         [Description("Retrieve only first X objects")]
-        public int LimitSearch
-        {
+        public int LimitSearch {
             get { return _limitSearch; }
-            set
-            {
+            set {
                 if (value <= 0)
                     throw new InvalidDataException("Must be greater than zero");
                 _limitSearch = value;
@@ -113,11 +104,9 @@ namespace HuntingDog.Config
         [Category("GENERAL")]
         [DisplayName("Font Size")]
         [Description("Requires SSMS restart. Font size used for search results.")]
-        public int FontSize
-        {
+        public int FontSize {
             get { return _fontSize; }
-            set
-            {
+            set {
                 _fontSize = value;
                 if (_fontSize < 8)
                     _fontSize = 8;
@@ -131,52 +120,31 @@ namespace HuntingDog.Config
         [Category("GENERAL")]
         [DisplayName("Hot Key: Ctrl+")]
         [Description("Requires SSMS restart.Launch Hunting Dog using Ctrl + this key.")]
-        public string LaunchingHotKey
-        {
+        public string LaunchingHotKey {
             get { return _launchingHotKey; }
-            set
-            {
+            set {
                 if (value.Length != 1)
                     throw new InvalidDataException("Must be one character");
                 _launchingHotKey = value;
             }
         }
 
-        private bool _hideAfterAction = false;
-
         [Category("GENERAL")]
         [DisplayName("Hide window after action")]
         [Description("Hide Hunting Dog window after action is completed.")]
-        public bool HideAfterAction
-        {
-          get { return _hideAfterAction; }
-          set
-          {
-            _hideAfterAction = value;
-          }
-        }
-
-        private bool _showAfterOpen = false;
+        public bool HideAfterAction { get; set; } = false;
 
         [Category("GENERAL")]
         [DisplayName("Show window after openning an addin")]
         [Description("Show Huntiong Dog window after creation of the plugin window.")]
-        public bool ShowAfterOpen
-        {
-          get { return _showAfterOpen; }
-          set
-          {
-            _showAfterOpen = value;
-          }
-        }
-  
+        public bool ShowAfterOpen { get; set; } = false;
+
         [Category("MODIFY")]
         [DisplayName("Inspect Body using")]
         [Description("When inspecting Procedure, View or Function body use ALTER or CREATE script")]
         public EAlterOrCreate AlterOrCreate { get; set; }
 
-        public DogConfig CloneMe()
-        {
+        public DogConfig CloneMe() {
             return (DogConfig)this.MemberwiseClone();
         }
     }

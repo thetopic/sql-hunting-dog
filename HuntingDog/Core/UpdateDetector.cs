@@ -5,10 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 
-namespace HuntingDog.Core
-{
-    public class UpdateDetector
-    {
+namespace HuntingDog.Core {
+    public class UpdateDetector {
         public const String UserPref_IgnoredVersion = "Ignored Update";
         public const String Url_ToCheckUpdates = "http://www.sql-hunting-dog.com/update.txt";
 
@@ -23,48 +21,40 @@ namespace HuntingDog.Core
 
         Version _versionToIgnore;
 
-        public event Action<DogVersion> NewVersionFound;  
+        public event Action<DogVersion> NewVersionFound;
 
         UpdateNotificator UpdateNotificator = new UpdateNotificator();
-        HuntingDog.DogEngine.ISavableStorage Storage {  get;  set; }
-        public UpdateDetector(HuntingDog.DogEngine.ISavableStorage storage)
-        {
+        DogEngine.ISavableStorage Storage { get; set; }
+        public UpdateDetector(DogEngine.ISavableStorage storage) {
             Storage = storage;
             _versionToIgnore = DetermineVersionToIgnore();
             log.Info("Version to Ignore: " + _versionToIgnore.ToString());
             UpdateNotificator.Start(Url_ToCheckUpdates, TimerInitialPeriod, OnNewVersion);
         }
 
-        void OnNewVersion(DogVersion v)
-        {
-            try
-            {
-                lock (_door)
-                {
+        void OnNewVersion(DogVersion v) {
+            try {
+                lock (_door) {
                     _newDogVersion = v;
                 }
 
-                if (_versionToIgnore == null || v.Version > _versionToIgnore)
-                {
+                if (_versionToIgnore == null || v.Version > _versionToIgnore) {
                     log.Info("New version found: " + v.Version);
                     UpdateNotificator.ChangePeriod(TimerPeriodNewVersinWasDetected);
-                    NotifyNewVersionFound(v);    
-                }              
-                else
-                {
+                    NotifyNewVersionFound(v);
+                }
+                else {
                     log.Info("Same version found: " + v.Version);
                     UpdateNotificator.ChangePeriod(TimerPeriodIfSameVersionDetected);
                 }
 
             }
-            catch(Exception ex)
-            {
-                log.Error("On new version failed",ex);
+            catch (Exception ex) {
+                log.Error("On new version failed", ex);
             }
         }
 
-        Version DetermineVersionToIgnore()
-        {
+        Version DetermineVersionToIgnore() {
             var currentVersion = DogVersion.Current;
             var ignoredByUser = RetreiveIgnoredVersion();
             if (ignoredByUser == null)
@@ -76,51 +66,39 @@ namespace HuntingDog.Core
                 return currentVersion;
         }
 
-        Version RetreiveIgnoredVersion()
-        {
-            try
-            {
+        Version RetreiveIgnoredVersion() {
+            try {
                 var ignoredVersion = Storage.GetByName(UserPref_IgnoredVersion);
-                if (!string.IsNullOrEmpty(ignoredVersion))
-                {
+                if (!string.IsNullOrEmpty(ignoredVersion)) {
                     return new Version(ignoredVersion);
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 log.Error("Failed to retreive ignored Version");
             }
             return null;
         }
 
 
-        void StoreIgnoredVersion()
-        {
-            try
-            {
-             
+        void StoreIgnoredVersion() {
+            try {
+
                 Storage.StoreByName(UserPref_IgnoredVersion, _versionToIgnore.ToString());
                 Storage.Save();
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 log.Error("Failed to Store ignored Version");
-            }        
+            }
         }
 
-        public void StopDetection()
-        {
+        public void StopDetection() {
             UpdateNotificator.Stop();
-        }        
+        }
 
-        public void IgnoreVersion()
-        {
-            try
-            {
-                lock (_door)
-                {
-                    if (_newDogVersion != null)
-                    {                    
+        public void IgnoreVersion() {
+            try {
+                lock (_door) {
+                    if (_newDogVersion != null) {
                         _versionToIgnore = _newDogVersion.Version;
                         log.Info("Ignoring version: " + _versionToIgnore);
                     }
@@ -128,23 +106,18 @@ namespace HuntingDog.Core
                 }
 
                 StoreIgnoredVersion();
-              
+
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 log.Error("Ignore Version failed", ex);
             }
         }
 
-        public void Download()
-        {
-            try
-            {
-             
-                lock (_door)
-                {
-                    if (_newDogVersion != null)
-                    {
+        public void Download() {
+            try {
+
+                lock (_door) {
+                    if (_newDogVersion != null) {
                         Process.Start(_newDogVersion.UrlToDownload);
                         log.Info("Downloading a new version: " + _newDogVersion);
                     }
@@ -152,27 +125,23 @@ namespace HuntingDog.Core
                         log.Error("Download was invoked but new version is not known");
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 log.Error("Download failed", ex);
             }
         }
 
-   
-        private void NotifyNewVersionFound(DogVersion version)
-        {
-            try
-            {
+
+        private void NotifyNewVersionFound(DogVersion version) {
+            try {
                 if (NewVersionFound != null)
                     NewVersionFound(version);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 log.Error("New Version Notification failed", ex);
             }
         }
 
-     
+
 
         public Action<DogVersion> NewVersion { get; set; }
     }

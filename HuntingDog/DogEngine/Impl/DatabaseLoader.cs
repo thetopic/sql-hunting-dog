@@ -1,57 +1,45 @@
 ﻿
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using HuntingDog.Core;
-using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Smo;
 
-namespace HuntingDog.DogEngine.Impl
-{
-    public class DatabaseLoader : IDatabaseLoader
-    {
+namespace HuntingDog.DogEngine.Impl {
+    public class DatabaseLoader : IDatabaseLoader {
         protected readonly Log log = LogFactory.GetLog();
 
         private SqlConnectionInfo connectionInfo;
 
         private Server server;
 
-        public Server Server
-        {
-            get
-            {
+        public Server Server {
+            get {
                 return server;
             }
         }
 
-        public SqlConnectionInfo Connection
-        {
-            get
-            {
+        public SqlConnectionInfo Connection {
+            get {
                 return connectionInfo;
             }
         }
 
-        private List<IDatabaseDictionary> DictionaryList
-        {
+        private List<IDatabaseDictionary> DictionaryList {
             get;
             set;
         }
 
-        public String Name
-        {
-            get
-            {
+        public String Name {
+            get {
                 return connectionInfo.ServerName;
             }
         }
 
-        IEnumerable<Database> VisibleDatabases
-        {
-            get
-            {
+        IEnumerable<Database> VisibleDatabases {
+            get {
                 return (from Database d in server.Databases
                         where
                             !d.IsSystemObject && d.IsAccessible
@@ -59,19 +47,16 @@ namespace HuntingDog.DogEngine.Impl
             }
         }
 
-        public List<String> DatabaseList
-        {
-            get
-            {
+        public List<String> DatabaseList {
+            get {
                 return (from Database d in VisibleDatabases
                         select d.Name).ToList();
             }
         }
 
-        
 
-        public void Initialise(IServerWithConnection serverWithConnection)
-        {
+
+        public void Initialise(IServerWithConnection serverWithConnection) {
             DictionaryList = new List<IDatabaseDictionary>();
             this.connectionInfo = serverWithConnection.Connection;
             server = new Server(new ServerConnection(connectionInfo));
@@ -94,12 +79,10 @@ namespace HuntingDog.DogEngine.Impl
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000")]
-        public List<DatabaseSearchResult> Find(String searchText, String databaseName, Int32 limit, List<string> keywordsToHighligh)
-        {
+        public List<DatabaseSearchResult> Find(String searchText, String databaseName, Int32 limit, List<string> keywordsToHighligh) {
             var dbDictionary = DictionaryList.FirstOrDefault(x => x.DatabaseName == databaseName);
 
-            if (dbDictionary == null)
-            {
+            if (dbDictionary == null) {
                 dbDictionary = new DatabaseDictionary();
                 dbDictionary.Initialise(databaseName);
                 DictionaryList.Add(dbDictionary);
@@ -109,23 +92,19 @@ namespace HuntingDog.DogEngine.Impl
             return dbDictionary.Find(searchText, limit, keywordsToHighligh);
         }
 
-        public void RefreshDatabaseList()
-        {
+        public void RefreshDatabaseList() {
             server.Databases.Refresh(true);
         }
 
-        void FillDatabase(IDatabaseDictionary databaseDictionary)
-        {
+        void FillDatabase(IDatabaseDictionary databaseDictionary) {
             var analyzer = new PerformanceAnalyzer();
 
             Database d = null;
 
-            if (server.Databases.Contains(databaseDictionary.DatabaseName))
-            {
+            if (server.Databases.Contains(databaseDictionary.DatabaseName)) {
                 d = server.Databases[databaseDictionary.DatabaseName];
             }
-            else
-            {
+            else {
                 log.Error("Database name could not be found: " + databaseDictionary.DatabaseName + "; loader failed");
                 return;
             }
@@ -143,12 +122,9 @@ namespace HuntingDog.DogEngine.Impl
             analyzer.Stop();
         }
 
-        void LoadObjects(Database d, IDatabaseDictionary databaseDictionary)
-        {
-            if (!d.IsSystemObject && d.IsAccessible)
-            {
-                try
-                {
+        void LoadObjects(Database d, IDatabaseDictionary databaseDictionary) {
+            if (!d.IsSystemObject && d.IsAccessible) {
+                try {
                     var analyzer = new PerformanceAnalyzer();
 
                     LoadTables(d, databaseDictionary);
@@ -165,143 +141,109 @@ namespace HuntingDog.DogEngine.Impl
 
                     analyzer.Stop();
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     // this can get thrown for security reasons - probably need to swallow here
                     log.Error("Security Error in database: " + d.Name, ex);
                 }
             }
         }
 
-        public void RefreshDatabase(String name)
-        {
+        public void RefreshDatabase(String name) {
             var d = server.Databases[name];
             RefresDatabase(d);
 
             // remove hashed objects
             var dbDictionary = DictionaryList.FirstOrDefault(x => x.DatabaseName == name);
 
-            if (dbDictionary != null)
-            {
+            if (dbDictionary != null) {
                 DictionaryList.Remove(dbDictionary);
             }
         }
 
-        private void RefresDatabase(Database d)
-        {
-            try
-            {
+        private void RefresDatabase(Database d) {
+            try {
                 d.Refresh();
             }
-            catch
-            {
+            catch {
                 // TODO: Do not swallow, log at least.
             }
 
-            try
-            {
+            try {
                 d.Tables.Refresh();
             }
-            catch
-            {
+            catch {
                 // TODO: Do not swallow, log at least.
             }
 
-            try
-            {
+            try {
                 d.StoredProcedures.Refresh();
             }
-            catch
-            {
+            catch {
                 // TODO: Do not swallow, log at least.
             }
 
-            try
-            {
+            try {
                 d.Views.Refresh();
             }
-            catch
-            {
+            catch {
                 // TODO: Do not swallow, log at least.
             }
 
-            try
-            {
+            try {
                 d.UserDefinedFunctions.Refresh();
             }
-            catch
-            {
+            catch {
                 // TODO: Do not swallow, log at least.
             }
         }
 
-        private void LoadFunctions(Database d, IDatabaseDictionary databaseDictionary)
-        {
-            foreach (UserDefinedFunction f in d.UserDefinedFunctions)
-            {
-                try
-                {
-                    if (!f.IsSystemObject)
-                    {
+        private void LoadFunctions(Database d, IDatabaseDictionary databaseDictionary) {
+            foreach (UserDefinedFunction f in d.UserDefinedFunctions) {
+                try {
+                    if (!f.IsSystemObject) {
                         databaseDictionary.Add(d, f, connectionInfo);
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     log.Error("Error loading view " + f.Name + " from db " + d.Name, ex);
                 }
             }
         }
 
-        private void LoadViews(Database d, IDatabaseDictionary databaseDictionary)
-        {
-            foreach (View v in d.Views)
-            {
-                try
-                {
-                    if (!v.IsSystemObject)
-                    {
+        private void LoadViews(Database d, IDatabaseDictionary databaseDictionary) {
+            foreach (View v in d.Views) {
+                try {
+                    if (!v.IsSystemObject) {
                         databaseDictionary.Add(d, v, connectionInfo);
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     log.Error("Error loading view " + v.Name + " from db " + d.Name, ex);
                 }
             }
         }
 
-        private void LoadStoredProcs(Database d, IDatabaseDictionary databaseDictionary)
-        {
-            foreach (StoredProcedure p in d.StoredProcedures)
-            {
-                try
-                {
-                    if (!p.IsSystemObject)
-                    {
+        private void LoadStoredProcs(Database d, IDatabaseDictionary databaseDictionary) {
+            foreach (StoredProcedure p in d.StoredProcedures) {
+                try {
+                    if (!p.IsSystemObject) {
                         databaseDictionary.Add(d, p, connectionInfo);
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     log.Error("Error loading procedure " + p.Name + " from db " + d.Name, ex);
                 }
             }
         }
 
-        private void LoadTables(Database d, IDatabaseDictionary databaseDictionary)
-        {
-            foreach (Table t in d.Tables)
-            {
-                try
-                {
-                    if (!t.IsSystemObject)
-                    {
+        private void LoadTables(Database d, IDatabaseDictionary databaseDictionary) {
+            foreach (Table t in d.Tables) {
+                try {
+                    if (!t.IsSystemObject) {
                         databaseDictionary.Add(d, t, connectionInfo);
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     log.Error("Error loading table " + t.Name + " from db " + d.Name, ex);
                 }
             }

@@ -3,24 +3,19 @@ using Microsoft.SqlServer.Management.Common;
 using System;
 using System.Collections.Generic;
 
-namespace HuntingDog.DogEngine
-{
-    public interface IDatabaseLoader
-    {
-        SqlConnectionInfo Connection
-        {
+namespace HuntingDog.DogEngine {
+    public interface IDatabaseLoader {
+        SqlConnectionInfo Connection {
             get;
         }
 
-        String Name
-        {
+        String Name {
             get;
         }
 
-       
 
-        List<String> DatabaseList
-        {
+
+        List<String> DatabaseList {
             get;
         }
 

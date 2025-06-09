@@ -1,36 +1,29 @@
 ﻿
 using System;
 
-namespace HuntingDog.DogEngine
-{
-    public class TableColumn
-    {
-        public String Name
-        {
+namespace HuntingDog.DogEngine {
+    public class TableColumn {
+        public String Name {
             get;
             set;
         }
 
-        public String Type
-        {
+        public String Type {
             get;
             set;
         }
 
-        public Boolean Nullable
-        {
+        public Boolean Nullable {
             get;
             set;
         }
 
-        public Boolean IsPrimaryKey
-        {
+        public Boolean IsPrimaryKey {
             get;
             set;
         }
 
-        public Boolean IsForeignKey
-        {
+        public Boolean IsForeignKey {
             get;
             set;
         }

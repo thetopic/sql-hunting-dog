@@ -1,20 +1,15 @@
-﻿
-using Microsoft.SqlServer.Management.Common;
+﻿using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using System;
 using System.Collections.Generic;
 
-namespace HuntingDog.DogEngine
-{
-    public interface IDatabaseDictionary
-    {
-        String DatabaseName
-        {
+namespace HuntingDog.DogEngine {
+    public interface IDatabaseDictionary {
+        String DatabaseName {
             get;
         }
 
-        Boolean IsLoaded
-        {
+        Boolean IsLoaded {
             get;
         }
 

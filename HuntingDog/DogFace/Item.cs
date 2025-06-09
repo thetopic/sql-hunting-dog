@@ -5,70 +5,57 @@ using System.Windows;
 using System.Windows.Media;
 using HuntingDog.DogEngine;
 
-namespace HuntingDog.DogFace
-{
-    public class Item : DependencyObject
-    {
+namespace HuntingDog.DogFace {
+    public class Item : DependencyObject {
         private String name;
 
-        public String Name
-        {
-            get
-            {
+        public String Name {
+            get {
                 return name;
             }
 
-            set
-            {
+            set {
                 name = value;
                 UpperCaseNames = Name.ToUpper();
             }
         }
 
-        public Entity Entity
-        {
+        public Entity Entity {
             get;
             set;
         }
 
-        public IServer Server
-        {
+        public IServer Server {
             get;
             set;
         }
 
-        public string UpperCaseNames
-        {
+        public string UpperCaseNames {
             get;
             private set;
         }
 
-        public String NavigationTooltip
-        {
+        public String NavigationTooltip {
             get;
             set;
         }
 
-        public String MainObjectTooltip
-        {
+        public String MainObjectTooltip {
             get;
             set;
         }
 
-        public ImageSource Image
-        {
+        public ImageSource Image {
             get;
             set;
         }
 
-        public IList<Action> Actions
-        {
+        public IList<Action> Actions {
             get;
             private set;
         }
 
-        public List<String> Keywords
-        {
+        public List<String> Keywords {
             get;
             set;
         }
@@ -79,15 +66,12 @@ namespace HuntingDog.DogFace
             typeof(Item)
         );
 
-        public Boolean IsChecked
-        {
-            get
-            {
-                return (Boolean) GetValue(IsCheckedProperty);
+        public Boolean IsChecked {
+            get {
+                return (Boolean)GetValue(IsCheckedProperty);
             }
 
-            set
-            {
+            set {
                 SetValue(IsCheckedProperty, value);
             }
         }
@@ -98,21 +82,17 @@ namespace HuntingDog.DogFace
             typeof(Item)
         );
 
-        public Boolean IsMouseOver
-        {
-            get
-            {
-                return (Boolean) GetValue(IsMouseOverProperty);
+        public Boolean IsMouseOver {
+            get {
+                return (Boolean)GetValue(IsMouseOverProperty);
             }
 
-            set
-            {
+            set {
                 SetValue(IsMouseOverProperty, value);
             }
         }
 
-        public Item()
-        {
+        public Item() {
             Actions = new List<Action>();
         }
     }

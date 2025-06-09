@@ -1,74 +1,61 @@
 ﻿
+using DatabaseObjectSearcher;
+using Microsoft.SqlServer.Management.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using DatabaseObjectSearcher;
 using HuntingDog.Core;
-using Microsoft.SqlServer.Management.Common;
-
-
 using Thread = System.Threading.Thread;
 
-namespace HuntingDog.DogEngine.Impl
-{
+namespace HuntingDog.DogEngine.Impl {
 
-    public class MyServer : IServerWithConnection, IEquatable<MyServer>, IEquatable<IServer>
-    {
+    public class MyServer : IServerWithConnection, IEquatable<MyServer>, IEquatable<IServer> {
         SqlConnectionInfo _connectionInfo;
-        public MyServer(SqlConnectionInfo ci)
-        {
+        public MyServer(SqlConnectionInfo ci) {
             _connectionInfo = ci;
         }
 
-        public string ServerName
-        {
+        public string ServerName {
             get { return _connectionInfo.ServerName; }
         }
 
-        public string ID
-        {
+        public string ID {
             get { return _connectionInfo.ConnectionString; }
         }
 
 
-        public bool Equals(MyServer other)
-        {
+        public bool Equals(MyServer other) {
             if (other == null)
                 return false;
-            return string.Compare(other.ID, this.ID, true ) == 0;
+            return string.Compare(other.ID, this.ID, true) == 0;
         }
 
 
-        public SqlConnectionInfo Connection
-        {
+        public SqlConnectionInfo Connection {
             get { return _connectionInfo; }
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             return this.Equals(obj as IServer);
         }
 
-        public override int GetHashCode()
-        {
-           
-                return ID.GetHashCode();
+        public override int GetHashCode() {
+
+            return ID.GetHashCode();
 
         }
 
-        public bool Equals(IServer other)
-        {
+        public bool Equals(IServer other) {
             if (other == null)
                 return false;
             return string.Compare(other.ID, this.ID, true) == 0;
         }
     }
 
-    
 
-    public interface IServerWatcher
-    {
+
+    public interface IServerWatcher {
         event Action<List<IServerWithConnection>> OnServersAdded;
 
         event Action<List<IServerWithConnection>> OnServersRemoved;
@@ -79,11 +66,10 @@ namespace HuntingDog.DogEngine.Impl
     /// <summary>
     /// Checks connected and disconnected servers periodically and notifies subscribers
     /// </summary>
-    public class ServerWatcher : IServerWatcher
-    {
+    public class ServerWatcher : IServerWatcher {
         private Thread serverCheck;
 
-        private ObjectExplorerManager  _manager;
+        private ObjectExplorerManager _manager;
         private AutoResetEvent stopThread = new AutoResetEvent(false);
 
         private AutoResetEvent verifyConnectionEvent = new AutoResetEvent(false);
@@ -93,85 +79,71 @@ namespace HuntingDog.DogEngine.Impl
         public event Action<List<IServerWithConnection>> OnServersAdded;
         public event Action<List<IServerWithConnection>> OnServersRemoved;
 
-        public ServerWatcher(ObjectExplorerManager manager)
-        {
+        public ServerWatcher(ObjectExplorerManager manager) {
             _manager = manager;
             _manager.OnNewServerConnected += new Action<SqlConnectionInfo>(_manager_OnNewServerConnected);
             Start();
         }
 
-        void _manager_OnNewServerConnected(SqlConnectionInfo obj)
-        {
+        void _manager_OnNewServerConnected(SqlConnectionInfo obj) {
             verifyConnectionEvent.Set();
         }
 
 
-        public void Start()
-        {
-              // run thread - this thread will check connected servers and will report if some servers will be disconnected.
-            serverCheck = new System.Threading.Thread(BackgroundThreadCheckServer);
+        public void Start() {
+            // run thread - this thread will check connected servers and will report if some servers will be disconnected.
+            serverCheck = new Thread(BackgroundThreadCheckServer);
             serverCheck.Start();
         }
 
-        public void Stop()
-        {
+        public void Stop() {
             stopThread.Set();
         }
 
 
-        public IEnumerable<IServerWithConnection> GetCurrentlyConnectedServers()
-        {
+        public IEnumerable<IServerWithConnection> GetCurrentlyConnectedServers() {
             var connStringList = _manager.GetAllServers();
-            return connStringList.ConvertAll(x => new MyServer(x)).Cast<IServerWithConnection>(); 
+            return connStringList.ConvertAll(x => new MyServer(x)).Cast<IServerWithConnection>();
         }
 
-        private void BackgroundThreadCheckServer()
-        {
+        private void BackgroundThreadCheckServer() {
             var oldList = GetCurrentlyConnectedServers();
 
-            if (stopThread.WaitOne(1 * 1000))
-            {
+            if (stopThread.WaitOne(1 * 1000)) {
                 return;
             }
 
-            while (true)
-            {
-             
-                try
-                {
-                    lock (this)
-                    {
+            while (true) {
+
+                try {
+                    lock (this) {
                         var newList = GetCurrentlyConnectedServers();
 
-                        if (oldList != null)
-                        {
-                          
+                        if (oldList != null) {
+
                             var removed = oldList.Except(newList).ToList();
                             var added = newList.Except(oldList).ToList();
 
 
-                            if (added.Any() && OnServersAdded != null)
-                            {
+                            if (added.Any() && OnServersAdded != null) {
                                 log.Info("Found " + added.Count.ToString() + " connected server");
                                 OnServersAdded(added);
                             }
 
-                            if (removed.Any() && OnServersRemoved != null)
-                            {
+                            if (removed.Any() && OnServersRemoved != null) {
                                 log.Info("Found " + removed.Count.ToString() + " disconnected server");
                                 OnServersRemoved(removed);
                             }
-                            
+
                         }
 
                         oldList = newList;
                     }
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     log.Error("Thread server checker", e);
                 }
-                
+
 
                 var waitHandles = new WaitHandle[] { stopThread, verifyConnectionEvent };
 
@@ -180,7 +152,7 @@ namespace HuntingDog.DogEngine.Impl
                 {
                     break;
                 }
-                
+
             }
         }
     }

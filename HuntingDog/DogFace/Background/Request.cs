@@ -1,24 +1,19 @@
 ﻿
 using System;
 
-namespace HuntingDog.DogFace.Background
-{
-    public class Request
-    {
-        public Object Argument
-        {
+namespace HuntingDog.DogFace.Background {
+    public class Request {
+        public Object Argument {
             get;
             set;
         }
 
-        public RequestType RequestType
-        {
+        public RequestType RequestType {
             get;
             set;
         }
 
-        public BackgroundProcessor.DoWork DoWorkFunction
-        {
+        public BackgroundProcessor.DoWork DoWorkFunction {
             get;
             set;
         }

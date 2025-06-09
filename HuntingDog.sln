@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29609.76
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36121.58 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{73617ECF-F02C-4D69-8DA0-F7E33BF560D9}"
 EndProject
@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinForms", "WinForms\WinFor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installers", "Installers", "{B1FE9DA2-02EB-4805-B47F-6F86E004FA0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuntingDog2019", "HuntingDog2019\HuntingDog2019.csproj", "{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuntingDog2021", "HuntingDog2021\HuntingDog2021.csproj", "{BF72D233-825A-45A4-9E82-522191B79C5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,10 +46,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{65855A0F-DFB6-4254-9E16-3F70839C9C98}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{65855A0F-DFB6-4254-9E16-3F70839C9C98}.Release|Any CPU.ActiveCfg = Release|x86
-		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6817CDC-17DA-4AF2-98EB-6EFCCDD196F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF72D233-825A-45A4-9E82-522191B79C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF72D233-825A-45A4-9E82-522191B79C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF72D233-825A-45A4-9E82-522191B79C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF72D233-825A-45A4-9E82-522191B79C5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

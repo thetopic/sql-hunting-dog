@@ -1,8 +1,6 @@
 ﻿
-namespace HuntingDog.DogFace.Background
-{
-    public enum RequestType : int
-    {
+namespace HuntingDog.DogFace.Background {
+    public enum RequestType : int {
         LoadObjects,
         Search,
         Details,
