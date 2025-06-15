@@ -263,7 +263,7 @@ namespace DatabaseObjectSearcher {
             EnvDTE.TextDocument doc = (EnvDTE.TextDocument)ServiceCache.ExtensibilityModel.Application.ActiveDocument.Object(null);
             // insert SQL definition to document
 
-            doc.EndPoint.CreateEditPoint().Insert(sqlText);
+            var editPoint = doc.EndPoint.CreateEditPoint();
         }
 
         private static Boolean IsNumeric(DataType dt) {
