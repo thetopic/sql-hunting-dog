@@ -257,7 +257,7 @@ namespace DatabaseObjectSearcher {
                 uiConn.AdvancedOptions.Set("DATABASE", connInfo.DatabaseName);
             }
 
-            ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql, uiConn, null);
+            ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql);
 
             // create new document
             EnvDTE.TextDocument doc = (EnvDTE.TextDocument)ServiceCache.ExtensibilityModel.Application.ActiveDocument.Object(null);
