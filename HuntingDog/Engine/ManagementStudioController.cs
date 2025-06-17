@@ -26,7 +26,7 @@ namespace DatabaseObjectSearcher {
 
         private static IFormatProvider _us_culture = null;
 
-        private static String CreateHeader(String sqlStr, SqlConnectionInfo connInfo) {
+        private static String CreateSqlHeader(String sqlStr, SqlConnectionInfo connInfo) {
             var stars = "-- Server : " + connInfo.ServerName + " -- " + Environment.NewLine;
             return (stars + sqlStr);
         }
@@ -245,10 +245,12 @@ namespace DatabaseObjectSearcher {
         }
 
         static private SqlDocument CreateSQLDocumentWithHeader(String sqlText, SqlConnectionInfo connInfo) {
-            return CreateSQLDocument(CreateHeader(sqlText, connInfo), connInfo);
+            var document = CreateBlankSQLDocument(connInfo);
+            document.InsertSql(CreateSqlHeader(sqlText, connInfo));
+            return document;
         }
 
-        static private SqlDocument CreateSQLDocument(String sqlText, SqlConnectionInfo connInfo) {
+        static private SqlDocument CreateBlankSQLDocument(SqlConnectionInfo connInfo) {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             if (!_uiConn.ContainsKey(connInfo.ServerName)) {
                 var aci = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo;
@@ -260,10 +262,7 @@ namespace DatabaseObjectSearcher {
                 uiConn.AdvancedOptions.Set("DATABASE", connInfo.DatabaseName);
             }
 
-            var document = SqlDocument.CreateBlankScriptDocument(uiConn);
-            document.InsertSql(sqlText);
-
-            return document;
+            return SqlDocument.CreateBlankScriptDocument(uiConn);
         }
 
         private static Boolean IsNumeric(DataType dt) {
