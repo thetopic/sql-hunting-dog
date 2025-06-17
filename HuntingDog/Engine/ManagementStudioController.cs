@@ -1,4 +1,8 @@
-﻿using Microsoft.SqlServer.Management.Common;
+﻿using EnvDTE;
+using HuntingDog;
+using HuntingDog.Config;
+using HuntingDog.Core;
+using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.Smo.RegSvrEnum;
 using Microsoft.SqlServer.Management.UI.VSIntegration;
@@ -9,9 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using HuntingDog;
-using HuntingDog.Config;
-using HuntingDog.Core;
+using System.Windows.Controls;
 using static Microsoft.SqlServer.Management.Smo.ScriptNameObjectBase;
 
 namespace DatabaseObjectSearcher {
@@ -36,6 +38,7 @@ namespace DatabaseObjectSearcher {
         }
 
         public static void SelectFromView(View view, SqlConnectionInfo connInfo, int selectTopX, bool includeAllCoulumnNamesForViews, bool includeWhereClause, bool addNoLockHint) {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             try {
                 var builder = new StringBuilder(1000);
 
@@ -55,9 +58,9 @@ namespace DatabaseObjectSearcher {
                     }
                 }
 
-                CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                var dte = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
 
-                System.Windows.Forms.SendKeys.Send("{F5}");
+                dte.ExecuteCommand("Query.Execute");
             }
             catch (Exception ex) {
                 log.Error("SelectFromView failed.", ex);
@@ -66,6 +69,7 @@ namespace DatabaseObjectSearcher {
 
 
         public static void SelectFromTable(Table tbl, SqlConnectionInfo connInfo, int selectTopXTable, bool includeAllCoulumnNamesForTables, bool includeWhereClause, bool addNoLockHint, EOrderBy orderBy) {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             try {
                 var builder = new StringBuilder(1000);
 
@@ -92,9 +96,9 @@ namespace DatabaseObjectSearcher {
 
                 }
 
-                CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                var dte = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
 
-                System.Windows.Forms.SendKeys.Send("{F5}");
+                dte.ExecuteCommand("Query.Execute");
             }
             catch (Exception ex) {
                 log.Error("SelectFromTable failed.", ex);
@@ -241,11 +245,11 @@ namespace DatabaseObjectSearcher {
             }
         }
 
-        static private void CreateSQLDocumentWithHeader(String sqlText, SqlConnectionInfo connInfo) {
-            CreateSQLDocument(CreateHeader(sqlText, connInfo), connInfo);
+        static private EnvDTE.DTE CreateSQLDocumentWithHeader(String sqlText, SqlConnectionInfo connInfo) {
+            return CreateSQLDocument(CreateHeader(sqlText, connInfo), connInfo);
         }
 
-        static private void CreateSQLDocument(String sqlText, SqlConnectionInfo connInfo) {
+        static private EnvDTE.DTE CreateSQLDocument(String sqlText, SqlConnectionInfo connInfo) {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             if (!_uiConn.ContainsKey(connInfo.ServerName)) {
                 var aci = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo;
@@ -264,6 +268,8 @@ namespace DatabaseObjectSearcher {
             // insert SQL definition to document
 
             doc.EndPoint.CreateEditPoint().Insert(sqlText);
+
+            return doc.DTE;
         }
 
         private static Boolean IsNumeric(DataType dt) {
