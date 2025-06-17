@@ -193,6 +193,7 @@
       <Link>Properties\Resources.Designer.cs</Link>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Engine\SqlDocument.cs" />
     <Compile Include="HuntingDog.cs">
       <DependentUpon>HuntingDog.vsct</DependentUpon>
       <AutoGen>True</AutoGen>

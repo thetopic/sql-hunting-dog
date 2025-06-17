@@ -2,6 +2,7 @@
 using HuntingDog;
 using HuntingDog.Config;
 using HuntingDog.Core;
+using HuntingDog.Engine;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.Smo.RegSvrEnum;
@@ -58,9 +59,8 @@ namespace DatabaseObjectSearcher {
                     }
                 }
 
-                var dte = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
-
-                dte.ExecuteCommand("Query.Execute");
+                var document = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                document.Execute();
             }
             catch (Exception ex) {
                 log.Error("SelectFromView failed.", ex);
@@ -96,9 +96,8 @@ namespace DatabaseObjectSearcher {
 
                 }
 
-                var dte = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
-
-                dte.ExecuteCommand("Query.Execute");
+                var document = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                document.Execute();
             }
             catch (Exception ex) {
                 log.Error("SelectFromTable failed.", ex);
@@ -245,11 +244,11 @@ namespace DatabaseObjectSearcher {
             }
         }
 
-        static private EnvDTE.DTE CreateSQLDocumentWithHeader(String sqlText, SqlConnectionInfo connInfo) {
+        static private SqlDocument CreateSQLDocumentWithHeader(String sqlText, SqlConnectionInfo connInfo) {
             return CreateSQLDocument(CreateHeader(sqlText, connInfo), connInfo);
         }
 
-        static private EnvDTE.DTE CreateSQLDocument(String sqlText, SqlConnectionInfo connInfo) {
+        static private SqlDocument CreateSQLDocument(String sqlText, SqlConnectionInfo connInfo) {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             if (!_uiConn.ContainsKey(connInfo.ServerName)) {
                 var aci = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo;
@@ -261,15 +260,10 @@ namespace DatabaseObjectSearcher {
                 uiConn.AdvancedOptions.Set("DATABASE", connInfo.DatabaseName);
             }
 
-            ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql);
+            var document = SqlDocument.CreateBlankScriptDocument(uiConn);
+            document.InsertSql(sqlText);
 
-            // create new document
-            EnvDTE.TextDocument doc = (EnvDTE.TextDocument)ServiceCache.ExtensibilityModel.Application.ActiveDocument.Object(null);
-            // insert SQL definition to document
-
-            doc.EndPoint.CreateEditPoint().Insert(sqlText);
-
-            return doc.DTE;
+            return document;
         }
 
         private static Boolean IsNumeric(DataType dt) {
