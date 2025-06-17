@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DatabaseObjectSearcher;
-using HuntingDog;
+﻿using DatabaseObjectSearcher;
 
 namespace HuntingDog.DogEngine.Impl {
     public class DiConstruct {

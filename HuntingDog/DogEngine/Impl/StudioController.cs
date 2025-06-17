@@ -1,10 +1,10 @@
 ﻿
 using DatabaseObjectSearcher;
+using HuntingDog.Core;
 using Microsoft.SqlServer.Management.Smo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HuntingDog.Core;
 
 
 
@@ -49,11 +49,10 @@ namespace HuntingDog.DogEngine.Impl {
 
         void _srvWatcher_OnServersRemoved(List<IServerWithConnection> removedServers) {
 
-            foreach (var removedServer in removedServers) {
-                if (Servers.ContainsKey(removedServer)) {
-                    Servers.Remove(removedServer);
-                }
-            }
+            removedServers
+                .Where(removedServer => Servers.ContainsKey(removedServer))
+                .Select(removedServer => Servers.Remove(removedServer))
+                .ToList();
 
             if (Servers.Count == 0) {
                 GC.Collect();
@@ -70,9 +69,7 @@ namespace HuntingDog.DogEngine.Impl {
                 Servers.Add(addedServer, nvServer);
             }
 
-
             OnServersAdded(addedServers.Cast<IServer>().ToList());
-
         }
 
 
@@ -82,30 +79,23 @@ namespace HuntingDog.DogEngine.Impl {
         }
 
 
-
-
-
         List<Entity> IStudioController.Find(IServer serverName, String databaseName, String searchText, int searchLimit) {
             var server = Servers[serverName];
             var keywords = new List<String>();
             var listFound = server.Find(searchText, databaseName, searchLimit, keywords);
-            var result = new List<Entity>();
 
-            foreach (var found in listFound) {
-                var e = new Entity();
-                e.Name = found.Name;
-                e.IsFunction = found.IsFunction;
-                e.IsProcedure = found.IsStoredProc;
-                e.IsTable = found.IsTable;
-                e.IsView = found.IsView;
-                e.FullName = found.SchemaAndName;
-                e.InternalObject = found.Result;
-                e.Keywords = keywords;
-                e.DatabaseName = databaseName;
-                result.Add(e);
-            }
-
-            return result;
+            return listFound.Select(found => new Entity {
+                Name = found.Name,
+                IsFunction = found.IsFunction,
+                IsProcedure = found.IsStoredProc,
+                IsTable = found.IsTable,
+                IsView = found.IsView,
+                FullName = found.SchemaAndName,
+                InternalObject = found.Result,
+                Keywords = keywords,
+                DatabaseName = databaseName
+            })
+                .ToList();
         }
 
         void IStudioController.NavigateObject(IServer server, Entity entityObject) {
@@ -122,20 +112,11 @@ namespace HuntingDog.DogEngine.Impl {
 
 
         List<IServer> IStudioController.ListServers() {
-            var res = new List<IServer>();
-            foreach (var srvKey in Servers.Keys) {
-                res.Add(srvKey);
-            }
-
-            return res;
+            return Servers.Keys.Select(srvKey => srvKey).ToList();
         }
 
         public List<String> ListDatabase(IServer serverName) {
-
-            if (Servers.ContainsKey(serverName)) {
-                return Servers[serverName].DatabaseList;
-            }
-            else {
+            if (! Servers.ContainsKey(serverName)) {
                 log.Error("Requested unknown server " + serverName.ID);
 
                 foreach (var srv in Servers) {
@@ -144,6 +125,8 @@ namespace HuntingDog.DogEngine.Impl {
 
                 return new List<String>();
             }
+
+            return Servers[serverName].DatabaseList;
         }
 
         void IStudioController.RefreshServer(IServer serverName) {
@@ -202,15 +185,16 @@ namespace HuntingDog.DogEngine.Impl {
                 var table = entityObject.InternalObject as Table;
                 table.Columns.Refresh();
 
-                foreach (Column tc in table.Columns) {
-                    result.Add(new TableColumn() {
-                        Name = tc.Name,
-                        IsPrimaryKey = tc.InPrimaryKey,
-                        IsForeignKey = tc.IsForeignKey,
-                        Nullable = tc.Nullable,
-                        Type = tc.DataType.Name
-                    });
-                }
+                result = table.Columns.Cast<Column>().Select(tc =>
+                new TableColumn() {
+                    Name = tc.Name,
+                    IsPrimaryKey = tc.InPrimaryKey,
+                    IsForeignKey = tc.IsForeignKey,
+                    Nullable = tc.Nullable,
+                    Type = tc.DataType.Name
+                })
+                    .ToList();
+
             }
             catch (Exception ex) {
                 log.Error("ListColumns failed: " + GetSafeEntityObject(entityObject), ex);
