@@ -10,6 +10,7 @@ using Microsoft.SqlServer.Management.UI.VSIntegration;
 using Microsoft.SqlServer.Management.UI.VSIntegration.Editors;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace DatabaseObjectSearcher {
     public class ManagementStudioController {
         private static readonly Log log = LogFactory.GetLog();
         private static Dictionary<String, UIConnectionInfo> _uiConn = new Dictionary<String, UIConnectionInfo>();
+        private static Dictionary<String, NameValueCollection> _uiConnAdvancedOptions = new Dictionary<String, NameValueCollection>();
 
         private static IFormatProvider _us_culture = null;
 
@@ -59,7 +61,7 @@ namespace DatabaseObjectSearcher {
                     }
                 }
 
-                var document = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                var document = CreateSQLDocument(builder.ToString(), connInfo);
                 document.Execute();
             }
             catch (Exception ex) {
@@ -96,8 +98,8 @@ namespace DatabaseObjectSearcher {
 
                 }
 
-                var document = CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
-                document.Execute();
+                var document = CreateSQLDocument(builder.ToString(), connInfo);
+                document?.Execute();
             }
             catch (Exception ex) {
                 log.Error("SelectFromTable failed.", ex);
@@ -157,7 +159,7 @@ namespace DatabaseObjectSearcher {
                     builder.Append(userDefinedFunction.TextBody);
                 }
 
-                CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                CreateSQLDocument(builder.ToString(), connInfo);
             }
             catch (Exception ex) {
                 log.Error("OpenFunctionForModification failed.", ex);
@@ -216,7 +218,7 @@ namespace DatabaseObjectSearcher {
                     builder.Append(originalSP);
                 }
 
-                CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                CreateSQLDocument(builder.ToString(), connInfo);
             }
             catch (Exception ex) {
                 log.Error("OpenStoredProcedureForModification failed.", ex);
@@ -237,32 +239,51 @@ namespace DatabaseObjectSearcher {
                     builder.Append(originalSP);
                 }
 
-                CreateSQLDocumentWithHeader(builder.ToString(), connInfo);
+                CreateSQLDocument(builder.ToString(), connInfo);
             }
             catch (Exception ex) {
                 log.Error("OpenStoredProcedureForModification failed.", ex);
             }
         }
 
-        static private SqlDocument CreateSQLDocumentWithHeader(String sqlText, SqlConnectionInfo connInfo) {
+        static private SqlDocument CreateSQLDocument(String sqlText, SqlConnectionInfo connInfo) {
             var document = CreateBlankSQLDocument(connInfo);
-            document.InsertSql(CreateSqlHeader(sqlText, connInfo));
+            document?.InsertSql(CreateSqlHeader(sqlText, connInfo));
             return document;
+        }
+
+        static private void UpdateAdvancedOptions() {
+            var aci = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo?.UIConnectionInfo;
+
+            if (aci != null) {
+                _uiConnAdvancedOptions[aci.ServerName] = aci.AdvancedOptions;
+            }
+        }
+        
+        static private UIConnectionInfo GetUiConnectionInfo(SqlConnectionInfo connInfo) {
+            if (!_uiConn.ContainsKey(connInfo.ServerName)) {
+                _uiConn[connInfo.ServerName] = CreateFrom(connInfo);
+            }
+
+            UpdateAdvancedOptions();
+            var uiConn = _uiConn[connInfo.ServerName];
+            if (uiConn != null) {
+                uiConn.AdvancedOptions.Clear();
+
+                if (_uiConnAdvancedOptions.ContainsKey(uiConn.ServerName)) {
+                    uiConn.AdvancedOptions.Add(_uiConnAdvancedOptions[uiConn.ServerName]);
+                }
+                uiConn.AdvancedOptions.Set("DATABASE", connInfo.DatabaseName);
+            }
+            UpdateAdvancedOptions();
+
+            return uiConn;
         }
 
         static private SqlDocument CreateBlankSQLDocument(SqlConnectionInfo connInfo) {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-            if (!_uiConn.ContainsKey(connInfo.ServerName)) {
-                var aci = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo;
-                _uiConn[connInfo.ServerName] = CreateFrom(connInfo);
-            }
 
-            var uiConn = _uiConn[connInfo.ServerName];
-            if (uiConn != null) {
-                uiConn.AdvancedOptions.Set("DATABASE", connInfo.DatabaseName);
-            }
-
-            return SqlDocument.CreateBlankScriptDocument(uiConn);
+            return SqlDocument.CreateBlankScriptDocument(GetUiConnectionInfo(connInfo));
         }
 
         private static Boolean IsNumeric(DataType dt) {
@@ -380,7 +401,7 @@ namespace DatabaseObjectSearcher {
                     }
                 }
 
-                CreateSQLDocumentWithHeader(execScript, connInfo);
+                CreateSQLDocument(execScript, connInfo);
 
             }
             catch (Exception ex) {
@@ -420,7 +441,7 @@ namespace DatabaseObjectSearcher {
 
                 }
 
-                CreateSQLDocumentWithHeader(execScript, connInfo);
+                CreateSQLDocument(execScript, connInfo);
 
             }
             catch (Exception ex) {
@@ -554,7 +575,7 @@ namespace DatabaseObjectSearcher {
                     }
                 }
 
-                CreateSQLDocumentWithHeader(select.ToString(), connInfo);
+                CreateSQLDocument(select.ToString(), connInfo);
             }
             catch (Exception ex) {
                 log.Error("Script Table failed.", ex);
