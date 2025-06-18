@@ -1,16 +1,11 @@
-
-//using Microsoft.SqlServer.Management.Smo.RegSvrEnum;
+using HuntingDog.Core;
 using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Sdk.Differencing.SPI;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.UI.VSIntegration;
 using Microsoft.SqlServer.Management.UI.VSIntegration.Editors;
-//using EnvDTE100;
-//using EnvDTE;
 using Microsoft.SqlServer.Management.UI.VSIntegration.ObjectExplorer;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,9 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using HuntingDog.Core;
-using HuntingDog.DogFace;
 
 namespace DatabaseObjectSearcher {
     public class ObjectExplorerManager {
