@@ -189,9 +189,12 @@ namespace DatabaseObjectSearcher
 
 			try
 			{
-				//  System.Threading.Thread.Sleep(80 * 1000);
-				var cmdEvents = (EnvDTE.CommandEvents)ServiceCache.ExtensibilityModel.Events.get_CommandEvents("{00000000-0000-0000-0000-000000000000}", 0);
-				cmdEvents.AfterExecute += this.AfterExecute;
+				var dte = Package.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+				if (dte != null)
+				{
+					var cmdEvents = (EnvDTE.CommandEvents)dte.Events.get_CommandEvents("{00000000-0000-0000-0000-000000000000}", 0);
+					cmdEvents.AfterExecute += this.AfterExecute;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -354,6 +357,15 @@ namespace DatabaseObjectSearcher
 			SelectNode(hierarchy.Root);
 		}
 
+		private static String BuildSelectScript(NamedSmoObject tbl)
+		{
+			if (tbl is Table table)
+				return $"SELECT TOP 200 * FROM [{table.Schema}].[{table.Name}]";
+			if (tbl is View view)
+				return $"SELECT TOP 200 * FROM [{view.Schema}].[{view.Name}]";
+			return $"SELECT TOP 200 * FROM [{tbl.Name}]";
+		}
+
 		[SuppressMessage("Microsoft.Reliability", "CA2000")]
 		public void OpenTable2(NamedSmoObject tbl, SqlConnectionInfo connection, Server server)
 		{
@@ -367,8 +379,19 @@ namespace DatabaseObjectSearcher
 				var t = Type.GetType("Microsoft.SqlServer.Management.UI.VSIntegration.ObjectExplorer.OpenTableHelperClass,ObjectExplorer", true, true);
 				var miSelectFromTable = t.GetMethod("SelectFromTableOrView", BindingFlags.Static | BindingFlags.Public);
 
-				//signature is: public static string SelectFromTableOrView(Server server, Urn urn, int topNValue)
-				String script = (String)miSelectFromTable.Invoke(null, new Object[] { server, tbl.Urn, 200 });
+				String script;
+				var paramCount = miSelectFromTable.GetParameters().Length;
+				if (paramCount == 3)
+				{
+					// SSMS 18: SelectFromTableOrView(Server server, Urn urn, int topNValue)
+					script = (String)miSelectFromTable.Invoke(null, new Object[] { server, tbl.Urn, 200 });
+				}
+				else
+				{
+					// SSMS 22+: signature inconnue — génération directe via SMO
+					script = BuildSelectScript(tbl);
+					log.Info($"SelectFromTableOrView a {paramCount} paramètres (SSMS 22+), script généré manuellement.");
+				}
 				fileName = CreateFile(script);
 
 				// invoke designer

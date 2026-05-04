@@ -1,0 +1,14 @@
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="HuntingDog.5b3a5944-ba3e-449d-8b79-4d194244b643" Version="1.0" Language="en-US" Publisher="HuntingDog" />
+        <DisplayName>SQL Hunting Dog</DisplayName>
+        <Description>Fast search and navigation across SQL Server database objects</Description>
+    </Metadata>
+    <Installation SystemComponent="false" AllUsers="true">
+        <InstallationTarget Id="Microsoft.VisualStudio.Ssms" Version="[22.0,)" />
+    </Installation>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" Path="HuntingDog.pkgdef" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+    </Assets>
+</PackageManifest>

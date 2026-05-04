@@ -10,7 +10,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -37,13 +38,13 @@ namespace HuntingDog
     /// </para>
     /// </remarks>
     ///
-    [ProvideAutoLoad(VSConstants.UICONTEXT.ShellInitialized_string)]
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.ShellInitialized_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
     [Guid(PackageGuids.HuntingDogPackageIDString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    public sealed class HuntingDogPackage : Package
+    public sealed class HuntingDogPackage : AsyncPackage
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HuntingDogPackage"/> class.
@@ -61,18 +62,11 @@ namespace HuntingDog
 
         public static HuntingDogPackage Instance { get; set; }
 
-        /// <summary>
-        /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initialization code that rely on services provided by VisualStudio.
-        /// </summary>
-        protected override void Initialize()
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
-            
-        HuntingDogCommand.Initialize(this);
-
-            // total hack https://ssmsschemafolders.codeplex.com/SourceControl/latest#README.md
-            DelayAddSkipLoadingReg();
+            await base.InitializeAsync(cancellationToken, progress);
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            await HuntingDogCommand.InitializeAsync(this);
         }
 
         public object GetServiceHelper(Type type)
@@ -81,26 +75,5 @@ namespace HuntingDog
         }
 
         #endregion
-
-        private void AddSkipLoadingReg()
-        {
-            var myPackage = UserRegistryRoot.CreateSubKey($@"Packages\{{{PackageGuids.HuntingDogPackageIDString}}}");
-            if (myPackage != null)
-            {
-                myPackage.SetValue("SkipLoading", 1);
-            }
-        }
-
-        private void DelayAddSkipLoadingReg()
-        {
-            var delay = new Timer();
-            delay.Tick += delegate (object o, EventArgs e)
-            {
-                delay.Stop();
-                AddSkipLoadingReg();
-            };
-            delay.Interval = 1000;
-            delay.Start();
-        }
     }
 }

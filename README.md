@@ -1,6 +1,6 @@
 # README #
 
-Addin works only in MS SSMS 18 (2019)
+Addin compatible with MS SSMS 18 (2019) and SSMS 19/20 (2022)
 
 
 Developed in Visual Studio 2019
@@ -15,7 +15,8 @@ If you see an `Unblock` button or checkbox then click it.
 Extract the zip file and copy the folder into the SSMS extension folder. Remove or replace any previous version.
 Run the included reg file to skip the load error.
 
-* 18 - `C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Extensions`
+* SSMS 18 - `C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Extensions`
+* SSMS 19/20 (2022) - `C:\Program Files (x86)\Microsoft SQL Server Management Studio 19\Common7\IDE\Extensions`
 
 
 

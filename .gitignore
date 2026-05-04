@@ -283,3 +283,5 @@ typings/
 # original (testing) files
 original/
 /typings.json
+/.claude
+/CLAUDE.md

@@ -1,18 +1,17 @@
 
+using EnvDTE;
+using EnvDTE80;
+using Extensibility;
+using HuntingDog.Core;
+using HuntingDog.DogFace;
+using Microsoft.SqlServer.Management.UI.VSIntegration;
+using Microsoft.VisualBasic.Compatibility.VB6;
+using Microsoft.VisualStudio.CommandBars;
 using System;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
-using EnvDTE;
-using EnvDTE80;
-using Extensibility;
-using HuntingDog.Core;
-using HuntingDog.DogEngine.Impl;
-using HuntingDog.DogFace;
-using Microsoft.SqlServer.Management.UI.VSIntegration;
-using Microsoft.VisualBasic.Compatibility.VB6;
-using Microsoft.VisualStudio.CommandBars;
 
 namespace HuntingDog
 {
