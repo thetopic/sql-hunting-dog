@@ -7,6 +7,8 @@ namespace HuntingDog
 {
     internal sealed class HuntingDogCommand
     {
+        private const string ToolWindowGuid = "{7C23E551-2E95-40A8-B783-3753D4E3DEAB}";
+
         private readonly AsyncPackage _package;
         public IVsWindowFrame _windowFrame = null;
         private HuntingDog.ucHost _uglyUsefuleDogFace;
@@ -34,32 +36,28 @@ namespace HuntingDog
         public static void Initialize(AsyncPackage package)
         {
             Instance = new HuntingDogCommand(package);
-            // Defer ShowToolWindow to let SSMS fully initialize its COM services before we access them.
-            // Accessing IObjectExplorerService or DTE too early causes InvalidComObjectException.
+            // Defer to let SSMS fully initialize its COM services before we access them.
             var delay = new System.Windows.Forms.Timer { Interval = 3000 };
             delay.Tick += (s, e) => { delay.Stop(); Instance.ShowToolWindow(); };
             delay.Start();
         }
 
+        // Explicit menu click — always show, regardless of ShowAfterOpen preference.
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            ShowToolWindow();
+            ThreadHelper.ThrowIfNotOnUIThread();
+            EnsureWindowCreated();
+            EnsureEngineInitialized();
+            _windowFrame?.Show();
+            HuntingDog.DogEngine.Impl.DiConstruct.Instance.ForceShowYourself();
         }
 
+        // Auto-show at startup — respects ShowAfterOpen preference.
         private void ShowToolWindow()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            const string TOOLWINDOW_GUID = "{7C23E551-2E95-40A8-B783-3753D4E3DEAB}";
-
-            if (_windowFrame == null)
-            {
-                _uglyUsefuleDogFace = new ucHost();
-                _windowFrame = CreateToolWindow(Caption, TOOLWINDOW_GUID, _uglyUsefuleDogFace);
-                ReadConfiguration();
-            }
-
+            EnsureWindowCreated();
             EnsureEngineInitialized();
-
             if (_windowFrame != null && _cfg.ShowAfterOpen)
             {
                 _windowFrame.Show();
@@ -67,13 +65,12 @@ namespace HuntingDog
             }
         }
 
-        // Called on menu click — always show the window.
-        private void ShowWindowOnDemand()
+        private void EnsureWindowCreated()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            EnsureEngineInitialized();
-            _windowFrame?.Show();
-            HuntingDog.DogEngine.Impl.DiConstruct.Instance.ForceShowYourself();
+            if (_windowFrame != null) return;
+            _uglyUsefuleDogFace = new ucHost();
+            _windowFrame = CreateToolWindow(Caption, ToolWindowGuid, _uglyUsefuleDogFace);
+            ReadConfiguration();
         }
 
         private void EnsureEngineInitialized()

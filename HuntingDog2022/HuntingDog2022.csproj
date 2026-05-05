@@ -176,12 +176,6 @@
     <Compile Include="..\HuntingDog\DogFace\WidthConverter.cs">
       <Link>DogFace\WidthConverter.cs</Link>
     </Compile>
-    <Compile Include="..\HuntingDog\Engine\AddinCreater.cs">
-      <Link>Engine\AddinCreater.cs</Link>
-    </Compile>
-    <Compile Include="..\HuntingDog\Engine\Connect.cs">
-      <Link>Engine\Connect.cs</Link>
-    </Compile>
     <Compile Include="..\HuntingDog\Engine\DatabaseSearchResult.cs">
       <Link>Engine\DatabaseSearchResult.cs</Link>
     </Compile>
@@ -394,9 +388,6 @@
     <Reference Include="Microsoft.CSharp">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic.Compatibility">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="PresentationCore">
       <Private>False</Private>
     </Reference>
@@ -442,9 +433,6 @@
     <EmbeddedResource Include="..\HuntingDog\DogFace\ucHost.resx">
       <Link>DogFace\ucHost.resx</Link>
       <DependentUpon>ucHost.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\HuntingDog\Engine\CommandBar.resx">
-      <Link>Engine\CommandBar.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\HuntingDog\Properties\Resources.resx">
       <Link>Properties\Resources.resx</Link>
