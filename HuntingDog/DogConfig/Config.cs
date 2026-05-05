@@ -1,9 +1,24 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.IO;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace HuntingDog.Config
 {
+    public class LocalizedDisplayNameAttribute : DisplayNameAttribute
+    {
+        private readonly string _key;
+        public LocalizedDisplayNameAttribute(string key) : base(key) { _key = key; }
+        public override string DisplayName => Loc.T(_key);
+    }
+
+    public class LocalizedDescriptionAttribute : DescriptionAttribute
+    {
+        private readonly string _key;
+        public LocalizedDescriptionAttribute(string key) : base(key) { _key = key; }
+        public override string Description => Loc.T(_key);
+    }
+
     public enum EAlterOrCreate
     {
         Alter,
@@ -45,46 +60,56 @@ namespace HuntingDog.Config
 
             HideAfterAction = false;
             ShowAfterOpen = true;
+
+            Language = "en";
         }
 
         [Category("SELECT")]
-        [DisplayName("Add Column Names to SELECT")]
-        [Description("Use 'SELECT *' or 'SELECT column1, column2..' syntax'")]
+        [LocalizedDisplayName("Prop_IncludeAllColumns")]
+        [LocalizedDescription("Desc_IncludeAllColumns")]
+        [PropertyOrder(1)]
         public bool IncludeAllColumns { get; set; }
 
         [Category("SCRIPT")]
-        [DisplayName("Script Indexes")]
-        [Description("Include Indexes when scripting a Table")]
+        [LocalizedDisplayName("Prop_ScriptIndexes")]
+        [LocalizedDescription("Desc_ScriptIndexes")]
+        [PropertyOrder(10)]
         public bool ScriptIndexes { get; set; }
 
         [Category("SCRIPT")]
-        [DisplayName("Script Triggers")]
-        [Description("Include Triggers when scripting a Table")]
+        [LocalizedDisplayName("Prop_ScriptTriggers")]
+        [LocalizedDescription("Desc_ScriptTriggers")]
+        [PropertyOrder(11)]
         public bool ScriptTriggers { get; set; }
 
         [Category("SCRIPT")]
-        [DisplayName("Script Foreign Keys")]
-        [Description("Include Foregn Keys when scripting a Table")]
+        [LocalizedDisplayName("Prop_ScriptForeignKeys")]
+        [LocalizedDescription("Desc_ScriptForeignKeys")]
+        [PropertyOrder(12)]
         public bool ScriptForeignKeys { get; set; }
 
         [Category("SELECT")]
-        [DisplayName("Add WHERE Caluse")]
-        [Description("Add commented WHERE clause that includes all columns and their types")]
+        [LocalizedDisplayName("Prop_AddWhereClauseFor")]
+        [LocalizedDescription("Desc_AddWhereClauseFor")]
+        [PropertyOrder(2)]
         public bool AddWhereClauseFor { get; set; }
 
         [Category("SELECT")]
-        [DisplayName("Add WITH(NOLOCK) Hint")]
-        [Description("Add NOLOCK hint. Can lead to dirty or inconsistent data to be presented")]
+        [LocalizedDisplayName("Prop_AddNoLock")]
+        [LocalizedDescription("Desc_AddNoLock")]
+        [PropertyOrder(3)]
         public bool AddNoLock { get; set; }
 
         [Category("SELECT")]
-        [DisplayName("User ORDER BY")]
-        [Description("Add Order by Primary Key(s) at the end of select statement")]
+        [LocalizedDisplayName("Prop_OrderBy")]
+        [LocalizedDescription("Desc_OrderBy")]
+        [PropertyOrder(4)]
         public EOrderBy OrderBy { get; set; }
 
         [Category("SELECT")]
-        [DisplayName("Select top X")]
-        [Description("Override row count limitation when you select data from the table or view")]
+        [LocalizedDisplayName("Prop_SelectTopX")]
+        [LocalizedDescription("Desc_SelectTopX")]
+        [PropertyOrder(5)]
         public int SelectTopX
         {
             get { return _selectTopXTable; }
@@ -97,8 +122,9 @@ namespace HuntingDog.Config
         }
 
         [Category("GENERAL")]
-        [DisplayName("Search Limit")]
-        [Description("Retrieve only first X objects")]
+        [LocalizedDisplayName("Prop_LimitSearch")]
+        [LocalizedDescription("Desc_LimitSearch")]
+        [PropertyOrder(20)]
         public int LimitSearch
         {
             get { return _limitSearch; }
@@ -111,8 +137,9 @@ namespace HuntingDog.Config
         }
 
         [Category("GENERAL")]
-        [DisplayName("Font Size")]
-        [Description("Requires SSMS restart. Font size used for search results.")]
+        [LocalizedDisplayName("Prop_FontSize")]
+        [LocalizedDescription("Desc_FontSize")]
+        [PropertyOrder(21)]
         public int FontSize
         {
             get { return _fontSize; }
@@ -129,8 +156,9 @@ namespace HuntingDog.Config
         private string _launchingHotKey = "D";
 
         [Category("GENERAL")]
-        [DisplayName("Hot Key: Ctrl+")]
-        [Description("Requires SSMS restart.Launch Hunting Dog using Ctrl + this key.")]
+        [LocalizedDisplayName("Prop_LaunchingHotKey")]
+        [LocalizedDescription("Desc_LaunchingHotKey")]
+        [PropertyOrder(22)]
         public string LaunchingHotKey
         {
             get { return _launchingHotKey; }
@@ -145,39 +173,54 @@ namespace HuntingDog.Config
         private bool _hideAfterAction = false;
 
         [Category("GENERAL")]
-        [DisplayName("Hide window after action")]
-        [Description("Hide Hunting Dog window after action is completed.")]
+        [LocalizedDisplayName("Prop_HideAfterAction")]
+        [LocalizedDescription("Desc_HideAfterAction")]
+        [PropertyOrder(23)]
         public bool HideAfterAction
         {
-          get { return _hideAfterAction; }
-          set
-          {
-            _hideAfterAction = value;
-          }
+            get { return _hideAfterAction; }
+            set { _hideAfterAction = value; }
         }
 
         private bool _showAfterOpen = false;
 
         [Category("GENERAL")]
-        [DisplayName("Show window after openning an addin")]
-        [Description("Show Huntiong Dog window after creation of the plugin window.")]
+        [LocalizedDisplayName("Prop_ShowAfterOpen")]
+        [LocalizedDescription("Desc_ShowAfterOpen")]
+        [PropertyOrder(24)]
         public bool ShowAfterOpen
         {
-          get { return _showAfterOpen; }
-          set
-          {
-            _showAfterOpen = value;
-          }
+            get { return _showAfterOpen; }
+            set { _showAfterOpen = value; }
         }
-  
+
         [Category("MODIFY")]
-        [DisplayName("Inspect Body using")]
-        [Description("When inspecting Procedure, View or Function body use ALTER or CREATE script")]
+        [LocalizedDisplayName("Prop_AlterOrCreate")]
+        [LocalizedDescription("Desc_AlterOrCreate")]
+        [PropertyOrder(30)]
         public EAlterOrCreate AlterOrCreate { get; set; }
+
+        [Category("GENERAL")]
+        [LocalizedDisplayName("Prop_Language")]
+        [LocalizedDescription("Desc_Language")]
+        [ItemsSource(typeof(LanguageItemsSource))]
+        [PropertyOrder(25)]
+        public string Language { get; set; } = "en";
 
         public DogConfig CloneMe()
         {
             return (DogConfig)this.MemberwiseClone();
+        }
+    }
+
+    public class LanguageItemsSource : IItemsSource
+    {
+        public ItemCollection GetValues()
+        {
+            var items = new ItemCollection();
+            items.Add("en", "English");
+            items.Add("fr", "Français");
+            return items;
         }
     }
 }

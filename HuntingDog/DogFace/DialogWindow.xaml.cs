@@ -13,6 +13,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HuntingDog.Config;
 using Xceed.Wpf.Toolkit;
+using Xceed.Wpf.Toolkit.PropertyGrid;
+using HuntingDog;
+
 
 namespace HuntingDog.DogFace
 {
@@ -42,6 +45,26 @@ namespace HuntingDog.DogFace
             private set;
         }
 
+
+        private bool _refreshingGrid;
+
+        private void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
+        {
+            if (DogConfig == null || _refreshingGrid) return;
+            Loc.Load(DogConfig.Language);
+            // Force the PropertyGrid to re-read DisplayName/Description from the new language.
+            _refreshingGrid = true;
+            try
+            {
+                var cfg = DogConfig;
+                _propertyGrid.SelectedObject = null;
+                _propertyGrid.SelectedObject = cfg;
+            }
+            finally
+            {
+                _refreshingGrid = false;
+            }
+        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {

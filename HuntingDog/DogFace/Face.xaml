@@ -442,7 +442,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <ComboBox 
+            <ComboBox
                       Grid.Row="1"
                       ToolTip="Server for hunting"
                       FontSize="14"
@@ -557,9 +557,9 @@
                                Height="24"
                                Margin="15,5,5,5"
                                Source="{Binding Source={x:Static properties:Resources.warning}, Converter={StaticResource bitmapConverter}}" />
-                        <TextBlock VerticalAlignment="Center" FontSize="16">No results found</TextBlock>
+                        <TextBlock x:Name="txtNoResults" VerticalAlignment="Center" FontSize="16" Text="No results found"/>
                     </StackPanel>
-                    <TextBlock VerticalAlignment="Center" Margin="5,2,0,0" FontSize="16"  x:Name="txtEmptyLine1">Try to <Hyperlink FontSize="16"  Click="Refresh_Click">Refresh</Hyperlink> database</TextBlock>
+                    <TextBlock VerticalAlignment="Center" Margin="5,2,0,0" FontSize="16" x:Name="txtEmptyLine1"><Run x:Name="runTryRefreshPart1" Text="Try to "/><Hyperlink FontSize="16" Click="Refresh_Click"><Run x:Name="runTryRefreshLink" Text="Refresh"/></Hyperlink><Run x:Name="runTryRefreshPart2" Text=" database"/></TextBlock>
                 </StackPanel>
             </Grid>
 
@@ -586,7 +586,7 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Button Tag="{Binding}"
-                                    ToolTip="Locate in Object Explorer"
+                                    ToolTip="{DynamicResource Str_TooltipLocate}"
                                     Focusable="False"
                                     BorderThickness="0"
                                     Background="Transparent"
@@ -634,8 +634,8 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal">
 
-            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" x:Name="txtOptionPermanent"> <Hyperlink Foreground="#6495ED"  Click="Options_Click">Options</Hyperlink></TextBlock>          
-            <TextBlock  VerticalAlignment="Center" Margin="15,0,0,0" x:Name="txtStatusTest">status</TextBlock>
+            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" x:Name="txtOptionPermanent"><Hyperlink Foreground="#6495ED" Click="Options_Click"><Run x:Name="runOptions" Text="Options"/></Hyperlink></TextBlock>
+            <TextBlock VerticalAlignment="Center" Margin="15,0,0,0" x:Name="txtStatusTest"/>
         </StackPanel>
         
     </Grid>

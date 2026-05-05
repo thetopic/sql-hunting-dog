@@ -184,6 +184,9 @@ namespace HuntingDog.DogFace
 
                 _userPref = UserPreferencesStorage.Load();
                 _cfg = _persistor.Restore<Config.DogConfig>(_userPref);
+                Loc.Load(_cfg.Language);
+                ApplyLanguageToUI();
+                Loc.LanguageChanged += OnLocLanguageChanged;
 
                 _processor.RequestFailed += new Action<Request, Exception>(_processor_RequestFailed);
                 StudioController.Initialise();
@@ -307,7 +310,7 @@ namespace HuntingDog.DogFace
 
         void _processor_RequestFailed(Request arg1, Exception arg2)
         {
-            SetStatus("Error:" + arg2.Message);
+            SetStatus(Loc.Format("Str_StatusError", arg2.Message));
             // notify user about an error
             log.Error("Request failed:" + arg1.Argument + " type:" + arg1.RequestType, arg2);
         }
@@ -365,7 +368,7 @@ namespace HuntingDog.DogFace
         {
             var cmd = (ServerDatabaseCommand)arg;
 
-            SetStatus("Reloading " + cmd.DatabaseName + "...", true);
+            SetStatus(Loc.Format("Str_StatusReloading", cmd.DatabaseName), true);
 
             StudioController.RefreshDatabase(cmd.Server, cmd.DatabaseName);
 
@@ -374,7 +377,7 @@ namespace HuntingDog.DogFace
                 DoSearch(true);
             });
 
-            SetStatus("Completed reloading " + cmd.DatabaseName);
+            SetStatus(Loc.Format("Str_StatusReloadDone", cmd.DatabaseName));
         }
 
         void ReloadDatabaseList(bool keepSameDatabase, bool setFocus = true)
@@ -570,7 +573,7 @@ namespace HuntingDog.DogFace
                 return;
             }
 
-            SetStatus("Searching '" + par.Text + "' in " + par.Database, true);
+            SetStatus(Loc.Format("Str_StatusSearching", par.Text, par.Database), true);
 
             var result = StudioController.Find(par.Srv, par.Database, par.Text, _cfg.LimitSearch);
 
@@ -581,7 +584,7 @@ namespace HuntingDog.DogFace
                 return;
             }
 
-            SetStatus("Found " + result.Count + " objects");
+            SetStatus(Loc.Format("Str_StatusFoundN", result.Count));
 
             InvokeInUI(() =>
             {
@@ -611,15 +614,15 @@ namespace HuntingDog.DogFace
 
             if (result.Count == 0)
             {
-                SetStatus("Found nothing. Try to refresh");
+                SetStatus(Loc.T("Str_StatusFoundNothing"));
             }
             else if (result.Count == 1)
             {
-                SetStatus("Found exactly one object");
+                SetStatus(Loc.T("Str_StatusFoundOne"));
             }
             else
             {
-                SetStatus("Found " + result.Count + " objects ");
+                SetStatus(Loc.Format("Str_StatusFoundN", result.Count));
             }
         }
 
@@ -647,8 +650,27 @@ namespace HuntingDog.DogFace
             }
         }
 
+        private void OnLocLanguageChanged(string lang)
+        {
+            Dispatcher.BeginInvoke((AnyInvoker)ApplyLanguageToUI);
+        }
+
+        private void ApplyLanguageToUI()
+        {
+            cbServer.ToolTip = Loc.T("Str_TooltipServer");
+            cbDatabase.ToolTip = Loc.T("Str_TooltipDatabase");
+            btnRefresh.ToolTip = Loc.T("Str_TooltipRefresh");
+            txtNoResults.Text = Loc.T("Str_NoResults");
+            runTryRefreshPart1.Text = Loc.T("Str_TryRefreshPart1");
+            runTryRefreshLink.Text = Loc.T("Str_TryRefreshLink");
+            runTryRefreshPart2.Text = Loc.T("Str_TryRefreshPart2");
+            runOptions.Text = Loc.T("Str_Options");
+            SetStatus(Loc.T("Str_StatusLanguageChanged"));
+        }
+
         private void UserControl_Unloaded(Object sender, RoutedEventArgs e)
         {
+            Loc.LanguageChanged -= OnLocLanguageChanged;
             Stop();
         }
 
@@ -1127,6 +1149,9 @@ namespace HuntingDog.DogFace
                     _persistor.Persist(_cfg, _userPref);
                     _userPref.Save();
                 }
+
+                Loc.Load(_cfg.Language);
+                ApplyLanguageToUI();
             }
 
             this.BlurDisable(new TimeSpan(0, 0, 0, 500), TimeSpan.Zero);

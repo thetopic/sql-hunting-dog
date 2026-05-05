@@ -87,6 +87,7 @@
     <Compile Include="..\HuntingDog\DogConfig\ConfigPersistor.cs">
       <Link>DogConfig\ConfigPersistor.cs</Link>
     </Compile>
+
     <Compile Include="..\HuntingDog\DogEngine\Entity.cs">
       <Link>DogEngine\Entity.cs</Link>
     </Compile>
@@ -178,6 +179,9 @@
     <Compile Include="..\HuntingDog\DogFace\WidthConverter.cs">
       <Link>DogFace\WidthConverter.cs</Link>
     </Compile>
+    <Compile Include="..\HuntingDog\DogEngine\Loc.cs">
+      <Link>DogEngine\Loc.cs</Link>
+    </Compile>
     <Compile Include="..\HuntingDog\Engine\DatabaseSearchResult.cs">
       <Link>Engine\DatabaseSearchResult.cs</Link>
     </Compile>
@@ -216,6 +220,16 @@
     </Page>
     <Page Include="..\HuntingDog\DogFace\Face.xaml">
       <Link>DogFace\Face.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\HuntingDog\DogFace\Localization\Strings.en.xaml">
+      <Link>DogFace\Localization\Strings.en.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\HuntingDog\DogFace\Localization\Strings.fr.xaml">
+      <Link>DogFace\Localization\Strings.fr.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

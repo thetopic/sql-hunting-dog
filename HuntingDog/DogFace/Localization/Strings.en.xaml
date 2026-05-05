@@ -1,0 +1,70 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Tooltips -->
+    <sys:String x:Key="Str_TooltipServer">Server for hunting</sys:String>
+    <sys:String x:Key="Str_TooltipDatabase">Database to sniff</sys:String>
+    <sys:String x:Key="Str_TooltipRefresh">Reload Databases and Objects</sys:String>
+    <sys:String x:Key="Str_TooltipLocate">Locate in Object Explorer</sys:String>
+
+    <!-- Empty results panel -->
+    <sys:String x:Key="Str_NoResults">No results found</sys:String>
+    <sys:String x:Key="Str_TryRefreshPart1">Try to </sys:String>
+    <sys:String x:Key="Str_TryRefreshLink">Refresh</sys:String>
+    <sys:String x:Key="Str_TryRefreshPart2"> database</sys:String>
+
+    <!-- Footer -->
+    <sys:String x:Key="Str_Options">Options</sys:String>
+    <sys:String x:Key="Str_StatusLanguageChanged">Language: English</sys:String>
+
+    <!-- Status bar messages -->
+    <sys:String x:Key="Str_StatusError">Error: {0}</sys:String>
+    <sys:String x:Key="Str_StatusReloading">Reloading {0}...</sys:String>
+    <sys:String x:Key="Str_StatusReloadDone">Completed reloading {0}</sys:String>
+    <sys:String x:Key="Str_StatusSearching">Searching '{0}' in {1}</sys:String>
+    <sys:String x:Key="Str_StatusFoundN">Found {0} objects</sys:String>
+    <sys:String x:Key="Str_StatusFoundNothing">Found nothing. Try to refresh</sys:String>
+    <sys:String x:Key="Str_StatusFoundOne">Found exactly one object</sys:String>
+
+    <!-- Config categories -->
+    <sys:String x:Key="Cat_SELECT">SELECT</sys:String>
+    <sys:String x:Key="Cat_SCRIPT">SCRIPT</sys:String>
+    <sys:String x:Key="Cat_GENERAL">GENERAL</sys:String>
+    <sys:String x:Key="Cat_MODIFY">MODIFY</sys:String>
+
+    <!-- Config property display names -->
+    <sys:String x:Key="Prop_IncludeAllColumns">Add Column Names to SELECT</sys:String>
+    <sys:String x:Key="Prop_ScriptIndexes">Script Indexes</sys:String>
+    <sys:String x:Key="Prop_ScriptTriggers">Script Triggers</sys:String>
+    <sys:String x:Key="Prop_ScriptForeignKeys">Script Foreign Keys</sys:String>
+    <sys:String x:Key="Prop_AddWhereClauseFor">Add WHERE Clause</sys:String>
+    <sys:String x:Key="Prop_AddNoLock">Add WITH(NOLOCK) Hint</sys:String>
+    <sys:String x:Key="Prop_OrderBy">Use ORDER BY</sys:String>
+    <sys:String x:Key="Prop_SelectTopX">Select top X</sys:String>
+    <sys:String x:Key="Prop_LimitSearch">Search Limit</sys:String>
+    <sys:String x:Key="Prop_FontSize">Font Size</sys:String>
+    <sys:String x:Key="Prop_LaunchingHotKey">Hot Key: Ctrl+</sys:String>
+    <sys:String x:Key="Prop_HideAfterAction">Hide window after action</sys:String>
+    <sys:String x:Key="Prop_ShowAfterOpen">Show window after opening</sys:String>
+    <sys:String x:Key="Prop_AlterOrCreate">Inspect Body using</sys:String>
+    <sys:String x:Key="Prop_Language">Language</sys:String>
+
+    <!-- Config property descriptions -->
+    <sys:String x:Key="Desc_IncludeAllColumns">Use 'SELECT *' or 'SELECT column1, column2..' syntax</sys:String>
+    <sys:String x:Key="Desc_ScriptIndexes">Include Indexes when scripting a Table</sys:String>
+    <sys:String x:Key="Desc_ScriptTriggers">Include Triggers when scripting a Table</sys:String>
+    <sys:String x:Key="Desc_ScriptForeignKeys">Include Foreign Keys when scripting a Table</sys:String>
+    <sys:String x:Key="Desc_AddWhereClauseFor">Add a commented WHERE clause with all columns and their types</sys:String>
+    <sys:String x:Key="Desc_AddNoLock">Add NOLOCK hint. Can lead to dirty or inconsistent data</sys:String>
+    <sys:String x:Key="Desc_OrderBy">Add ORDER BY on the Primary Key(s) at the end of the SELECT</sys:String>
+    <sys:String x:Key="Desc_SelectTopX">Override row count limitation when selecting from a table or view</sys:String>
+    <sys:String x:Key="Desc_LimitSearch">Retrieve only the first X objects</sys:String>
+    <sys:String x:Key="Desc_FontSize">Requires SSMS restart. Font size used for search results.</sys:String>
+    <sys:String x:Key="Desc_LaunchingHotKey">Requires SSMS restart. Launch Hunting Dog using Ctrl + this key.</sys:String>
+    <sys:String x:Key="Desc_HideAfterAction">Hide Hunting Dog window after an action is completed.</sys:String>
+    <sys:String x:Key="Desc_ShowAfterOpen">Show Hunting Dog window when the plugin panel is created.</sys:String>
+    <sys:String x:Key="Desc_AlterOrCreate">Use ALTER or CREATE script when inspecting a Procedure, View or Function.</sys:String>
+    <sys:String x:Key="Desc_Language">Interface language. Takes effect immediately.</sys:String>
+
+</ResourceDictionary>

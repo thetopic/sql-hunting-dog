@@ -25,14 +25,15 @@
 
         <xctk:PropertyGrid Grid.Row="0" DockPanel.Dock="Top" Background="#606495ED"
                                x:Name="_propertyGrid"
-                            HorizontalAlignment="Stretch" ShowSortOptions="False" ShowSearchBox="False" ShowSummary="True" Padding="5" NameColumnWidth="250">
+                            HorizontalAlignment="Stretch" ShowSortOptions="False" ShowSearchBox="False" ShowSummary="True" Padding="5" NameColumnWidth="250"
+                            PropertyValueChanged="OnPropertyValueChanged">
         </xctk:PropertyGrid>
         <DockPanel  Grid.Row="1">
 
 
             <StackPanel DockPanel.Dock="Right" Grid.Row="1" Orientation="Horizontal" Height="40" >
-                <Button Width="60" Margin="5" Click="Button_Click" IsCancel="True" >OK</Button>
-                <Button  Width="60"  Margin="5" IsCancel="True" Click="Button_Click_1">Cancel</Button>
+                <Button Width="60" Margin="5" Click="Button_Click" IsDefault="True">OK</Button>
+                <Button Width="60" Margin="5" IsCancel="True" Click="Button_Click_1">Cancel</Button>
             </StackPanel>
         </DockPanel>
     </Grid>
