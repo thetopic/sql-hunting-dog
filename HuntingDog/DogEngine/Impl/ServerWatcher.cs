@@ -127,7 +127,10 @@ namespace HuntingDog.DogEngine.Impl
 
         private void BackgroundThreadCheckServer()
         {
-            var oldList = GetCurrentlyConnectedServers();
+            // Start empty so existing servers are reported as "added" on the first poll.
+            // If we snapshot GetCurrentlyConnectedServers() here, those servers would never
+            // appear in OnServersAdded because the first comparison finds no difference.
+            IEnumerable<IServerWithConnection> oldList = Enumerable.Empty<IServerWithConnection>();
 
             if (stopThread.WaitOne(1 * 1000))
             {
