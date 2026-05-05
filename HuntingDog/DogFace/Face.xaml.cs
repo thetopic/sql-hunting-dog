@@ -104,8 +104,6 @@ namespace HuntingDog.DogFace
 
         private Boolean _isDragDropStartedFromText = false;
 
-        private UpdateDetector UpdateDetector;
-
         // small hint - to use anonymous delegates in InvokeUI method
         public delegate void AnyInvoker();
 
@@ -187,9 +185,6 @@ namespace HuntingDog.DogFace
                 _userPref = UserPreferencesStorage.Load();
                 _cfg = _persistor.Restore<Config.DogConfig>(_userPref);
 
-                UpdateDetector = new UpdateDetector(_userPref);
-                UpdateDetector.NewVersionFound += UpdateDetector_NewVersionFound;
-
                 _processor.RequestFailed += new Action<Request, Exception>(_processor_RequestFailed);
                 StudioController.Initialise();
                 StudioController.SetConfiguration(_cfg);
@@ -217,42 +212,6 @@ namespace HuntingDog.DogFace
         }
 
 
-
-        void UpdateDetector_NewVersionFound(DogVersion detected)
-        {
-            InvokeInUI(() =>
-            {
-                popupBorder.Visibility = System.Windows.Visibility.Visible;
-                popupUpdateText.Text = string.Format("New version is available ({0})", detected.Version.ToString());
-            });
-        }
-
-        private void CloseUpdate_Click(Object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                popupBorder.Visibility = System.Windows.Visibility.Collapsed;
-                UpdateDetector.IgnoreVersion();
-                _userPref.Save();
-            }
-            catch (Exception ex)
-            {
-                log.Error("Ignore new version failed", ex);
-            }
-
-        }
-
-        private void DownloadUpdate_Click(Object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                UpdateDetector.Download();
-            }
-            catch (Exception ex)
-            {
-                log.Error("Error opening download" + ex.Message, ex);
-            }
-        }
 
         void RestoreLastSearchTextFromUserProfile()
         {
