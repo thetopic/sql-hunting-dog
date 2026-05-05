@@ -220,14 +220,15 @@ namespace DatabaseObjectSearcher
 					{
 						if (n.Parent == null) //server node
 						{
-							log.Info("New Server Connected " + n.Name + " -  " + n.Connection.ServerName);
+							var sqlConn = n.Connection as SqlConnectionInfo;
+							if (sqlConn == null)
+								continue;
 
-							// this could mean that new server was added
-							var res = " server " + n.Name + n.Connection.ServerName;
+							log.Info("New Server Connected " + n.Name + " -  " + sqlConn.ServerName);
 
 							if (OnNewServerConnected != null)
 							{
-								OnNewServerConnected((SqlConnectionInfo)n.Connection);
+								OnNewServerConnected(sqlConn);
 							}
 						}
 						else if (n.ViewIdentity == "Server/Database")
@@ -337,7 +338,11 @@ namespace DatabaseObjectSearcher
 					if (provider != null)
 					{
 						INodeInformation containedItem = provider.GetService(typeof(INodeInformation)) as INodeInformation;
-						servers.Add(containedItem.Connection as SqlConnectionInfo);
+						if (containedItem == null)
+							continue;
+						var conn = containedItem.Connection as SqlConnectionInfo;
+						if (conn != null)
+							servers.Add(conn);
 					}
 				}
 
