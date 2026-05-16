@@ -1,25 +1,44 @@
 # README #
 
-Addin compatible with MS SSMS 18 (2019) and SSMS 19/20 (2022)
+SQL Hunting Dog — fast database object search panel for SSMS.
 
-
-Developed in Visual Studio 2019
+Compatible with:
+* **SSMS 18** (2019)
+* **SSMS 22** (2022) ✓
 
 ## Install
 
 [Download the latest release.](https://github.com/pstraszak/sql-hunting-dog/releases)
 
-You may need to unblock the zip file before extracting. Right click on the zip file in Windows Explorer and select Properties. 
-If you see an `Unblock` button or checkbox then click it. 
+**Step 1 — Unblock the zip**
 
-Extract the zip file and copy the folder into the SSMS extension folder. Remove or replace any previous version.
-Run the included reg file to skip the load error.
+Right-click the downloaded zip in Windows Explorer → Properties. If an `Unblock` button or checkbox is visible, click it before extracting.
 
-* SSMS 18 - `C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Extensions`
-* SSMS 19/20 (2022) - `C:\Program Files (x86)\Microsoft SQL Server Management Studio 19\Common7\IDE\Extensions`
+**Step 2 — Copy the extension folder**
 
+Extract the zip. Inside you will find a `HuntingDog` folder containing:
 
+```
+HuntingDog.dll
+HuntingDog.dll.config
+HuntingDog.pkgdef
+NLog.dll
+Xceed.Wpf.Toolkit.dll
+```
 
-### Contribution guidelines ###
+Copy the entire `HuntingDog` folder (not just its contents) into the SSMS Extensions directory for your version:
+
+| SSMS version | Extensions path |
+|---|---|
+| SSMS 18 (2019) | `C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Extensions\HuntingDog` |
+| SSMS 22 (2022) | `C:\Program Files\Microsoft SQL Server Management Studio 22\Release\Common7\IDE\Extensions\HuntingDog` |
+
+If a previous version is already installed, replace the folder entirely.
+
+**Step 3 — Restart SSMS**
+
+SQL Hunting Dog will appear under the **Tools** menu after restart.
+
+## Contribution guidelines
 
 * Create a separate branch and then generate a merge request
