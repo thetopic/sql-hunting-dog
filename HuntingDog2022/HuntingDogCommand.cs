@@ -1,3 +1,4 @@
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -71,6 +72,44 @@ namespace HuntingDog
             _uglyUsefuleDogFace = new ucHost();
             _windowFrame = CreateToolWindow(Caption, ToolWindowGuid, _uglyUsefuleDogFace);
             ReadConfiguration();
+
+            // Détection initiale du thème SSMS et abonnement aux changements futurs
+            ApplyCurrentTheme();
+            VSColorTheme.ThemeChanged += OnVsThemeChanged;
+        }
+
+        private void OnVsThemeChanged(ThemeChangedEventArgs e)
+        {
+            ApplyCurrentTheme();
+        }
+
+        /// <summary>
+        /// Lit la couleur de fond des tool windows SSMS et notifie ThemeManager.
+        /// Un fond sombre (luminance &lt; 0.5) → mode sombre.
+        /// </summary>
+        private void ApplyCurrentTheme()
+        {
+            try
+            {
+                // GetThemedColor retourne System.Drawing.Color (non nullable)
+                System.Drawing.Color bgColor = VSColorTheme.GetThemedColor(
+                    EnvironmentColors.ToolWindowBackgroundColorKey);
+
+                if (!bgColor.IsEmpty)
+                {
+                    double r = bgColor.R / 255.0;
+                    double g = bgColor.G / 255.0;
+                    double b = bgColor.B / 255.0;
+                    // Luminance perceptuelle (formule BT.709)
+                    double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                    bool isDark = luminance < 0.5;
+                    HuntingDog.DogFace.ThemeManager.Apply(isDark);
+                }
+            }
+            catch (Exception)
+            {
+                // Service de thème non disponible — on reste en mode clair par défaut
+            }
         }
 
         private void EnsureEngineInitialized()

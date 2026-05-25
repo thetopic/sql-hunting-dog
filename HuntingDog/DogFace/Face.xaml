@@ -36,6 +36,12 @@
             <SolidColorBrush x:Key="popupWindowTextBrush" Color="#999999"/>
             <SolidColorBrush x:Key="popupButtonForeground" Color="#9FF6F877"/>
 
+            <!-- Brushes commutables par le thème SSMS (valeurs par défaut = thème clair).
+                 ApplyTheme() dans Face.xaml.cs remplace ces entrées via DynamicResource. -->
+            <SolidColorBrush x:Key="TextForegroundBrush"   Color="#FF000000"/>
+            <SolidColorBrush x:Key="SearchBorderBrush"     Color="#506AA4B6"/>
+            <SolidColorBrush x:Key="HighlightKeywordBrush" Color="#FFE8A6"/>
+
             <!-- Gradient Brushes for Image Combo Boxes -->
             <LinearGradientBrush x:Key="NormalBrush" StartPoint="0,0" EndPoint="0,1">
                 <GradientBrush.GradientStops>
@@ -107,8 +113,8 @@
                     <Border x:Name="Border"
                             Grid.ColumnSpan="2"
                             CornerRadius="6"
-                            Background="White"
-                            BorderBrush="{StaticResource blueBlurBrush}"
+                            Background="{DynamicResource WindowBackgroundBrush}"
+                            BorderBrush="{DynamicResource blueBlurBrush}"
                             BorderThickness="0"/>
                     <Path x:Name="DownArrow"
                           Grid.Column="1"
@@ -121,15 +127,15 @@
 
                 <ControlTemplate.Triggers>
                     <Trigger Property="ToggleButton.IsMouseOver" Value="true">
-                        <Setter TargetName="Border" Property="Background" Value="{StaticResource blueVeryBlurBrush}"/>
+                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource blueVeryBlurBrush}"/>
                     </Trigger>
                     <Trigger Property="ToggleButton.IsChecked" Value="true">
-                        <Setter TargetName="Border" Property="Background" Value="{StaticResource PressedBrush}"/>
+                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource PressedBrush}"/>
                     </Trigger>
                     <Trigger Property="IsEnabled" Value="False">
-                        <Setter TargetName="Border" Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
+                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource DisabledBackgroundBrush}"/>
                         <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource DisabledBorderBrush}"/>
-                        <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}"/>
                     </Trigger>
                 </ControlTemplate.Triggers>
             </ControlTemplate>
@@ -143,7 +149,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ComboBoxItem">
-                            <Border Name="Border" Padding="2" Background="White" Opacity="100" SnapsToDevicePixels="true">
+                            <Border Name="Border" Padding="2" Background="{DynamicResource WindowBackgroundBrush}" Opacity="100" SnapsToDevicePixels="true">
                                 <ContentPresenter HorizontalAlignment="Left"/>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -151,10 +157,10 @@
                                     <Setter Property="Cursor" Value="Hand"/>
                                 </Trigger>
                                 <Trigger Property="IsHighlighted" Value="true">
-                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource blueBlurBrush}"/>
+                                    <Setter TargetName="Border" Property="Background" Value="{DynamicResource blueBlurBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -199,9 +205,9 @@
                                     <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
                                         <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                             <Border x:Name="DropDownBorder"
-                                                    Background="{StaticResource WindowBackgroundBrush}"
+                                                    Background="{DynamicResource WindowBackgroundBrush}"
                                                     BorderThickness="2"
-                                                    BorderBrush="{StaticResource blueBrush}"/>
+                                                    BorderBrush="{DynamicResource blueBrush}"/>
                                             <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
                                                 <Grid x:Name="itemsGrid" Height="Auto" Width="Auto" MaxWidth="{TemplateBinding MaxWidth}">
                                                     <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
@@ -216,16 +222,16 @@
                                     <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}"/>
                                 </Trigger>
                                 <Trigger Property="ComboBox.IsMouseOver" Value="true">
                                     <Setter Property="Cursor" Value="Hand"/>
                                 </Trigger>
                                 <Trigger Property="IsFocused" Value="False">
-                                    <Setter TargetName="br"  Property="BorderBrush" Value="{StaticResource blueBlurBrush}"/>
+                                    <Setter TargetName="br"  Property="BorderBrush" Value="{DynamicResource blueBlurBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsFocused" Value="True">
-                                    <Setter TargetName="br"  Property="BorderBrush" Value="{StaticResource blueBrush}"/>
+                                    <Setter TargetName="br"  Property="BorderBrush" Value="{DynamicResource blueBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsGrouping" Value="true">
                                     <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
@@ -256,8 +262,9 @@
         
     </UserControl.Resources>
 
-    <Grid>
-        
+    <Grid Background="{DynamicResource WindowBackgroundBrush}"
+          TextElement.Foreground="{DynamicResource TextForegroundBrush}">
+
         <Grid.Resources>
 
             <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
@@ -272,8 +279,8 @@
                         <ControlTemplate TargetType="ContextMenu">
                             <Border Name="Border"
                                     CornerRadius="4"
-                                    Background="{StaticResource WindowBackgroundBrush}"
-                                    BorderBrush="{StaticResource blueBrush}"
+                                    Background="{DynamicResource WindowBackgroundBrush}"
+                                    BorderBrush="{DynamicResource blueBrush}"
                                     BorderThickness="2" >
                                 <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
                             </Border>
@@ -306,7 +313,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListViewItem">
-                            <Border Name="SpecialBorder"  Background="Transparent" RenderTransformOrigin="0.5,0.5" BorderBrush="White" BorderThickness="1" CornerRadius="6" >
+                            <Border Name="SpecialBorder"  Background="Transparent" RenderTransformOrigin="0.5,0.5" BorderBrush="Transparent" BorderThickness="1" CornerRadius="6" >
                                 <Border.RenderTransform>
                                     <ScaleTransform ScaleX="1" ScaleY="1" />
                                 </Border.RenderTransform>
@@ -314,15 +321,15 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="true">
-                                    <Setter TargetName="SpecialBorder" Property="BorderBrush" Value="{StaticResource blueBlurBrush}"/>
-                                    <Setter TargetName="SpecialBorder" Property="Background" Value="{StaticResource blueBlurBrush}"/>
+                                    <Setter TargetName="SpecialBorder" Property="BorderBrush" Value="{DynamicResource blueBlurBrush}"/>
+                                    <Setter TargetName="SpecialBorder" Property="Background" Value="{DynamicResource blueBlurBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter  TargetName="SpecialBorder" Property="Cursor" Value="Hand"></Setter>
                                 </Trigger>
                                 <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                    <Setter TargetName="SpecialBorder" Property="BorderBrush" Value="{StaticResource blueBrush}"/>
-                                    <Setter TargetName="SpecialBorder" Property="Background" Value="{StaticResource blueBrush}"/>
+                                    <Setter TargetName="SpecialBorder" Property="BorderBrush" Value="{DynamicResource blueBrush}"/>
+                                    <Setter TargetName="SpecialBorder" Property="Background" Value="{DynamicResource blueBrush}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -411,10 +418,10 @@
             </Style>
 
             <Style x:Key="myHyperlink" TargetType="Hyperlink" BasedOn="{StaticResource {x:Type Hyperlink}}">
-                <Setter Property="Foreground" Value="{StaticResource blueBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource blueBrush}"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Foreground" Value="{StaticResource blueDarkBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource blueDarkBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -506,15 +513,15 @@
                        Width="18" />
             </Button>
             
-            <Border  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"                  
+            <Border  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                     HorizontalAlignment="Stretch"
                     MouseDown="borderText_MouseDown"
-                    Background="White"
+                    Background="{DynamicResource WindowBackgroundBrush}"
                     x:Name="borderText"
                     Margin="3,0,3,3"
                     CornerRadius="6"
                     BorderThickness="2"
-                    BorderBrush="#506AA4B6">
+                    BorderBrush="{DynamicResource SearchBorderBrush}">
                 <DockPanel  HorizontalAlignment="Stretch" >
                     <Image Margin="2,0,0,0"
                            Name="imgSearch"
@@ -536,6 +543,9 @@
                              MouseDoubleClick="txtSearch_SelectSearchText"
                              Margin="0,2,5,2"
                              FontSize="16"
+                             Background="{DynamicResource WindowBackgroundBrush}"
+                             Foreground="{DynamicResource TextForegroundBrush}"
+                             CaretBrush="{DynamicResource TextForegroundBrush}"
                              TextChanged="txtSearch_TextChanged" />
                 </DockPanel>
             </Border>
@@ -567,6 +577,8 @@
                       PreviewKeyDown="itemsControl_PreviewKeyDown"
                       x:Name="itemsControl"
                       BorderThickness="0"
+                      Background="{DynamicResource WindowBackgroundBrush}"
+                      Foreground="{DynamicResource TextForegroundBrush}"
                       ItemContainerStyle="{StaticResource SimpleListViewItem}"
                       SelectionChanged="ItemsControlSelectionChanged1" Grid.RowSpan="2">
                 <ListView.Resources />
@@ -634,7 +646,7 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal">
 
-            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" x:Name="txtOptionPermanent"><Hyperlink Foreground="#6495ED" Click="Options_Click"><Run x:Name="runOptions" Text="Options"/></Hyperlink></TextBlock>
+            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" x:Name="txtOptionPermanent"><Hyperlink Foreground="{DynamicResource blueBrush}" Click="Options_Click"><Run x:Name="runOptions" Text="Options"/></Hyperlink></TextBlock>
             <TextBlock VerticalAlignment="Center" Margin="15,0,0,0" x:Name="txtStatusTest"/>
         </StackPanel>
         

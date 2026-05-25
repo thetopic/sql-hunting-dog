@@ -136,6 +136,9 @@
     <Compile Include="..\HuntingDog\DogFace\Action.cs">
       <Link>DogFace\Action.cs</Link>
     </Compile>
+    <Compile Include="..\HuntingDog\DogFace\ThemeManager.cs">
+      <Link>DogFace\ThemeManager.cs</Link>
+    </Compile>
     <Compile Include="..\HuntingDog\DogFace\Background\BackgroundProcessor.cs">
       <Link>DogFace\Background\BackgroundProcessor.cs</Link>
     </Compile>

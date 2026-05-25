@@ -182,26 +182,55 @@ namespace HuntingDog.DogFace
             }
         }
 
+        /// <summary>
+        /// Rafraîchit la couleur des runs surlignés avec le thème courant.
+        /// Appelé depuis Face.ApplyTheme() lors d'un changement de thème.
+        /// </summary>
+        public void RefreshColors()
+        {
+            ChangeHighlight(DoHighlight);
+        }
+
         private void ChangeHighlight(Boolean selectedItem)
         {
-            Brush foregroundBrush = null;
-            Brush backgroundBrush = null;
+            Brush foregroundBrush;
+            Brush backgroundBrush;
 
             if (selectedItem)
             {
+                // Élément sélectionné : texte blanc sur fond bleu semi-transparent (blueBlurBrush)
                 foregroundBrush = new SolidColorBrush(Colors.White);
                 backgroundBrush = new SolidColorBrush(Colors.Transparent);
             }
             else
             {
-                foregroundBrush = new SolidColorBrush(Colors.Black);
-                backgroundBrush = new SolidColorBrush(Color.FromRgb(255,232,166));
+                // Mot-clé correspondant : utilise les ressources thématiques si disponibles
+                foregroundBrush = GetThemeBrush("TextForegroundBrush",
+                    new SolidColorBrush(Colors.Black));
+                backgroundBrush = GetThemeBrush("HighlightKeywordBrush",
+                    new SolidColorBrush(Color.FromRgb(255, 232, 166)));
             }
 
             foreach (var run in runs)
             {
                 run.Foreground = foregroundBrush;
                 run.Background = backgroundBrush;
+            }
+        }
+
+        /// <summary>
+        /// Remonte l'arbre visuel pour trouver la ressource thématique ;
+        /// retourne <paramref name="fallback"/> si introuvable.
+        /// </summary>
+        private Brush GetThemeBrush(string key, Brush fallback)
+        {
+            try
+            {
+                return TryFindResource(key) as Brush ?? fallback;
+            }
+            catch
+            {
+                return fallback;
             }
         }
     }

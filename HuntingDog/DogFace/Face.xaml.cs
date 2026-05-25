@@ -188,6 +188,10 @@ namespace HuntingDog.DogFace
                 ApplyLanguageToUI();
                 Loc.LanguageChanged += OnLocLanguageChanged;
 
+                // Thème SSMS : abonnement + application immédiate du thème courant
+                ThemeManager.ThemeChanged += OnThemeChanged;
+                ApplyTheme(ThemeManager.IsDark);
+
                 _processor.RequestFailed += new Action<Request, Exception>(_processor_RequestFailed);
                 StudioController.Initialise();
                 StudioController.SetConfiguration(_cfg);
@@ -670,6 +674,7 @@ namespace HuntingDog.DogFace
 
         private void UserControl_Unloaded(Object sender, RoutedEventArgs e)
         {
+            ThemeManager.ThemeChanged -= OnThemeChanged;
             Loc.LanguageChanged -= OnLocLanguageChanged;
             Stop();
         }
@@ -1328,6 +1333,128 @@ namespace HuntingDog.DogFace
                 HuntingDog.DogEngine.Impl.DiConstruct.Instance.ForceHideYourselfIfNeeded();
         }
 
-      
+        // ─── Thème SSMS ──────────────────────────────────────────────────────────
+
+        private void OnThemeChanged(bool isDark)
+        {
+            // ThemeManager peut être appelé depuis n'importe quel thread
+            InvokeInUI(() => ApplyTheme(isDark));
+        }
+
+        /// <summary>
+        /// Applique le thème clair ou sombre en remplaçant les entrées
+        /// de la ResourceDictionary ; DynamicResource met tout à jour automatiquement.
+        /// </summary>
+        internal void ApplyTheme(bool isDark)
+        {
+            try
+            {
+                if (isDark)
+                {
+                    // ── Fond et texte ─────────────────────────────────────────
+                    SetBrush("WindowBackgroundBrush",    Color.FromRgb(0x25, 0x25, 0x26));
+                    SetBrush("TextForegroundBrush",      Color.FromRgb(0xCC, 0xCC, 0xCC));
+                    SetBrush("SearchBorderBrush",        Color.FromRgb(0x3F, 0x3F, 0x46));
+                    // ── Accent bleu (plus vif sur fond sombre) ────────────────
+                    SetBrush("blueBrush",                Color.FromRgb(0x7E, 0xAE, 0xFF));
+                    SetBrush("blueDarkBrush",            Color.FromRgb(0x5C, 0x8E, 0xFF));
+                    SetBrush("blueBlurBrush",            Color.FromArgb(0x80, 0x7E, 0xAE, 0xFF));
+                    SetBrush("blueVeryBlurBrush",        Color.FromArgb(0x40, 0x7E, 0xAE, 0xFF));
+                    SetBrush("DownArrowBrush",           Color.FromRgb(0x7E, 0xAE, 0xFF));
+                    // ── États désactivés ──────────────────────────────────────
+                    SetBrush("DisabledForegroundBrush",  Color.FromRgb(0x66, 0x66, 0x66));
+                    SetBrush("DisabledBackgroundBrush",  Color.FromRgb(0x2D, 0x2D, 0x30));
+                    // ── Popup info-bulle ──────────────────────────────────────
+                    SetBrush("popupWindowBackground",    Color.FromRgb(0x2D, 0x2D, 0x30));
+                    SetBrush("popupWindowTextBrush",     Color.FromRgb(0xAA, 0xAA, 0xAA));
+                    // ── Surbrillance des mots-clés ───────────────────────────
+                    SetBrush("HighlightKeywordBrush",    Color.FromRgb(0x5A, 0x3E, 0x00));
+                    // ── Gradient ComboBox → aplatis ───────────────────────────
+                    SetBrush("NormalBrush",              Color.FromRgb(0x2D, 0x2D, 0x30));
+                    SetBrush("DarkBrush",                Color.FromRgb(0x1E, 0x1E, 0x1E));
+                    SetBrush("PressedBrush",             Color.FromRgb(0x3F, 0x3F, 0x46));
+                }
+                else
+                {
+                    // ── Thème clair (valeurs d'origine) ──────────────────────
+                    SetBrush("WindowBackgroundBrush",    Color.FromRgb(0xFF, 0xFF, 0xFF));
+                    SetBrush("TextForegroundBrush",      Color.FromRgb(0x00, 0x00, 0x00));
+                    SetBrush("SearchBorderBrush",        Color.FromArgb(0x50, 0x6A, 0xA4, 0xB6));
+                    SetBrush("blueBrush",                Color.FromRgb(0x64, 0x95, 0xED));
+                    SetBrush("blueDarkBrush",            Color.FromRgb(0x00, 0x45, 0xBC));
+                    SetBrush("blueBlurBrush",            Color.FromArgb(0x60, 0x64, 0x95, 0xED));
+                    SetBrush("blueVeryBlurBrush",        Color.FromArgb(0x30, 0x64, 0x95, 0xED));
+                    SetBrush("DownArrowBrush",           Color.FromRgb(0x64, 0x95, 0xED));
+                    SetBrush("DisabledForegroundBrush",  Color.FromRgb(0x88, 0x88, 0x88));
+                    SetBrush("DisabledBackgroundBrush",  Color.FromRgb(0xEE, 0xEE, 0xEE));
+                    SetBrush("popupWindowBackground",    Color.FromRgb(0xFF, 0xFF, 0xD5));
+                    SetBrush("popupWindowTextBrush",     Color.FromRgb(0x99, 0x99, 0x99));
+                    SetBrush("HighlightKeywordBrush",    Color.FromRgb(0xFF, 0xE8, 0xA6));
+                    // Restaure les gradients d'origine
+                    var normal = new LinearGradientBrush();
+                    normal.StartPoint = new System.Windows.Point(0, 0);
+                    normal.EndPoint   = new System.Windows.Point(0, 1);
+                    normal.GradientStops.Add(new GradientStop(Color.FromRgb(0xFF, 0xFF, 0xFF), 0.0));
+                    normal.GradientStops.Add(new GradientStop(Color.FromRgb(0xCC, 0xCC, 0xCC), 1.0));
+                    Resources["NormalBrush"] = normal;
+
+                    var dark = new LinearGradientBrush();
+                    dark.StartPoint = new System.Windows.Point(0, 0);
+                    dark.EndPoint   = new System.Windows.Point(0, 1);
+                    dark.GradientStops.Add(new GradientStop(Color.FromRgb(0xFF, 0xFF, 0xFF), 0.0));
+                    dark.GradientStops.Add(new GradientStop(Color.FromRgb(0xAA, 0xAA, 0xAA), 1.0));
+                    Resources["DarkBrush"] = dark;
+
+                    var pressed = new LinearGradientBrush();
+                    pressed.StartPoint = new System.Windows.Point(0, 0);
+                    pressed.EndPoint   = new System.Windows.Point(0, 1);
+                    pressed.GradientStops.Add(new GradientStop(Color.FromRgb(0xBB, 0xBB, 0xBB), 0.0));
+                    pressed.GradientStops.Add(new GradientStop(Color.FromRgb(0xEE, 0xEE, 0xEE), 0.1));
+                    pressed.GradientStops.Add(new GradientStop(Color.FromRgb(0xEE, 0xEE, 0xEE), 0.9));
+                    pressed.GradientStops.Add(new GradientStop(Color.FromRgb(0xFF, 0xFF, 0xFF), 1.0));
+                    Resources["PressedBrush"] = pressed;
+                }
+
+                // Mise à jour des brushes utilisés dans les gestionnaires focus/blur
+                _borderBrush = (Brush)Resources["blueBrush"];
+                _blurBrush   = (Brush)Resources["blueBlurBrush"];
+
+                // Ré-applique l'état courant de la bordure de recherche
+                if (borderText != null)
+                    borderText.BorderBrush = txtSearch.IsKeyboardFocusWithin ? _borderBrush : _blurBrush;
+
+                // Opacité de l'icône loupe : légèrement plus visible en mode sombre
+                if (imgSearch != null)
+                    imgSearch.Opacity = txtSearch.IsKeyboardFocusWithin ? 1.0 : (isDark ? 0.55 : 0.3);
+
+                // Force le rafraîchissement des surbrillances de mots-clés
+                RefreshHighlights();
+            }
+            catch (Exception ex)
+            {
+                log.Error("ApplyTheme failed: " + ex.Message, ex);
+            }
+        }
+
+        private void SetBrush(string key, Color color)
+        {
+            Resources[key] = new SolidColorBrush(color);
+        }
+
+        /// <summary>Rafraîchit la couleur des runs surlignés dans tous les items visibles.</summary>
+        private void RefreshHighlights()
+        {
+            if (itemsControl == null) return;
+            for (int i = 0; i < itemsControl.Items.Count; i++)
+            {
+                var container = itemsControl.ItemContainerGenerator.ContainerFromIndex(i) as ListViewItem;
+                if (container != null)
+                {
+                    var htmlBlock = container.FindChild<HtmlTextBlock>();
+                    htmlBlock?.RefreshColors();
+                }
+            }
+        }
+
     }
 }
