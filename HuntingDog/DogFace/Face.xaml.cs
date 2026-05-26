@@ -1133,10 +1133,9 @@ namespace HuntingDog.DogFace
 
         private void Options_Click(Object sender, RoutedEventArgs e)
         {
-
             var cfgWindow = new DialogWindow();
-
             cfgWindow.ShowConfiguration(_cfg);
+            cfgWindow.ApplyTheme(ThemeManager.IsDark);   // synchronise le thème SSMS
 
             this.BlurApply(10, new TimeSpan(0, 0, 0, 500), TimeSpan.Zero);
 
