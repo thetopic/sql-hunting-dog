@@ -6,7 +6,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d"
              Title="Hunting Dog Configuration"
-             Height="500"
+             Height="700"
              Width="400"
              ResizeMode="NoResize"
              d:DesignHeight="300" d:DesignWidth="300">
