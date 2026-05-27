@@ -62,7 +62,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <CreateVsixContainer>False</CreateVsixContainer>
+    <CreateVsixContainer>True</CreateVsixContainer>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+    <DeployExtension>False</DeployExtension>
+    <CopyVsixExtensionLocation>C:\Program Files\Microsoft SQL Server Management Studio 22\Release\Common7\IDE\Extensions\HuntingDog</CopyVsixExtensionLocation>
   </PropertyGroup>
   <ItemGroup>
     <!-- Shared source files linked from HuntingDog\ -->
@@ -87,7 +90,6 @@
     <Compile Include="..\HuntingDog\DogConfig\ConfigPersistor.cs">
       <Link>DogConfig\ConfigPersistor.cs</Link>
     </Compile>
-
     <Compile Include="..\HuntingDog\DogEngine\Entity.cs">
       <Link>DogEngine\Entity.cs</Link>
     </Compile>
