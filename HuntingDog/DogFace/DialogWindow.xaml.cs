@@ -180,6 +180,18 @@ namespace HuntingDog.DogFace
                     // Aligne l'ItemContainerStyle sur notre style implicite
                     // (couvre les éditeurs Xceed qui injectent leur propre style)
                     cb.ItemContainerStyle = (Style)Resources[typeof(ComboBoxItem)];
+                    // Quand Xceed utilise IItemsSource il pose DisplayMemberPath="Value"
+                    // sans ItemTemplate → SelectionBoxItemTemplate reste null dans notre
+                    // ContentPresenter → fallback ToString() → "Xceed.wpf.Tool…".
+                    // On crée un ItemTemplate explicite pour corriger l'affichage.
+                    if (!string.IsNullOrEmpty(cb.DisplayMemberPath) && cb.ItemTemplate == null)
+                    {
+                        var dp = cb.DisplayMemberPath;
+                        cb.DisplayMemberPath = null;   // WPF interdit DisplayMemberPath + ItemTemplate simultanément
+                        var factory = new FrameworkElementFactory(typeof(TextBlock));
+                        factory.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding(dp));
+                        cb.ItemTemplate = new DataTemplate { VisualTree = factory };
+                    }
                     // Reparcourir l'arbre interne après application du template
                     cb.Dispatcher.BeginInvoke(
                         System.Windows.Threading.DispatcherPriority.Render,
